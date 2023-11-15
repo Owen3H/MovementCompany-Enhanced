@@ -9,14 +9,16 @@ using UnityEngine;
 namespace MovementCompany.Component {
     internal class MovementScript : MonoBehaviour {
         public PlayerControllerB myPlayer;
-        bool inAir;
+
         public static Vector3 wantedVelToAdd;
 
         private Vector3 previousForward;
 
-        public float jumpTime
+        public float jumpTime;
 
-        public static float jumpTimeMultiplier = 10f { get; }
+        private static float jumpTimeMultiplier = 10f;
+
+        bool inAir;
         
         public void Update() {
             if (myPlayer.playerBodyAnimator.GetBool("Jumping") && jumpTime < 0.1f) {
