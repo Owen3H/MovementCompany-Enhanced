@@ -18,6 +18,8 @@ namespace MovementCompany.Component {
 
         private static float jumpTimeMultiplier = 10f;
 
+        private static float velocityMultiplioer = 4.2f;
+
         bool inAir;
         
         public void Update() {
@@ -30,7 +32,7 @@ namespace MovementCompany.Component {
 
             #region Handle grounded
             bool grounded = myPlayer.thisController.isGrounded;
-            if (grounded && myPlayer.isClimbingLadder) {
+            if (grounded || myPlayer.isClimbingLadder) {
                 wantedVelToAdd = Vector3.Lerp(wantedVelToAdd, Vector3.zero, Time.deltaTime * 4.2f);
                 inAir = false;
                 jumpTime = 0;
@@ -39,7 +41,7 @@ namespace MovementCompany.Component {
             }
             #endregion
 
-            #region Apply bhop
+            #region Jumping - apply bhop
             if (!inAir) {
                 inAir = true;
 
