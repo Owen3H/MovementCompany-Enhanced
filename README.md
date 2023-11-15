@@ -5,7 +5,7 @@ Bhop mod for Lethal Company
 
 ## Goals
 - Code optimization
-- Add ability to tweak values - they are currently hardcoded.
+- Remove hardcoded values in favour of a config file.
 
 # Installation
 1. Install [BepInEx](https://github.com/BepInEx/BepInEx) 5 into your game.
