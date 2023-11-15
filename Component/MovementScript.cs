@@ -11,48 +11,55 @@ namespace MovementCompany.Component {
         public PlayerControllerB myPlayer;
         bool inAir;
         public static Vector3 wantedVelToAdd;
-        public float jumpTime;
 
         private Vector3 previousForward;
+
+        public float jumpTime
+
+        public static float jumpTimeMultiplier = 10f { get; }
         
         public void Update() {
             if (myPlayer.playerBodyAnimator.GetBool("Jumping") && jumpTime < 0.1f) {
                 myPlayer.fallValue = myPlayer.jumpForce;
-                jumpTime += Time.deltaTime * 10f;
+                jumpTime += Time.deltaTime * jumpTimeMultiplier;
             }
 
             myPlayer.sprintMeter = 100;
 
-            if (!myPlayer.thisController.isGrounded && !myPlayer.isClimbingLadder)
-            {
-                if (!inAir) {
-                    inAir = true;
-
-                    Vector3 vel = myPlayer.thisController.velocity;
-                    vel.y = 0;
-                    
-                    wantedVelToAdd += 0.006f * vel;
-                }
-
-                Vector3 currentForward = myPlayer.gameObject.transform.forward;
-                
-                wantedVelToAdd.y = 0;
-                myPlayer.thisController.Move(currentForward * wantedVelToAdd.magnitude);
-
-                Vector3 forwardChange = currentForward - previousForward;
-                float rotationThreshold = 0.01f;
-
-                if (forwardChange.magnitude > rotationThreshold)
-                    wantedVelToAdd += new Vector3(0.0005f, 0.0005f, 0.0005f);
-
-                previousForward = currentForward;
-            }
-            else
-            {
+            #region Handle grounded
+            bool grounded = myPlayer.thisController.isGrounded;
+            if (grounded && myPlayer.isClimbingLadder) {
                 wantedVelToAdd = Vector3.Lerp(wantedVelToAdd, Vector3.zero, Time.deltaTime * 4.2f);
                 inAir = false;
                 jumpTime = 0;
+
+                return;
             }
+            #endregion
+
+            #region Apply bhop
+            if (!inAir) {
+                inAir = true;
+
+                Vector3 vel = myPlayer.thisController.velocity;
+                vel.y = 0;
+                
+                wantedVelToAdd += 0.006f * vel;
+            }
+
+            Vector3 currentForward = myPlayer.gameObject.transform.forward;
+            
+            wantedVelToAdd.y = 0;
+            myPlayer.thisController.Move(currentForward * wantedVelToAdd.magnitude);
+
+            Vector3 forwardChange = currentForward - previousForward;
+            float rotationThreshold = 0.01f;
+
+            if (forwardChange.magnitude > rotationThreshold)
+                wantedVelToAdd += new Vector3(0.0005f, 0.0005f, 0.0005f);
+
+            previousForward = currentForward;
+            #endregion
         }
     }
 }
