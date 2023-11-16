@@ -1,7 +1,7 @@
 using GameNetcodeStuff;
 using UnityEngine;
 
-using Plugin = MovementCompany.Core.MovementCompany;
+using MovementCompany.Core;
 
 namespace MovementCompany.Component {
     internal class MovementAdder : MonoBehaviour {
