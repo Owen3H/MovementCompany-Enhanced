@@ -61,7 +61,7 @@ namespace MovementCompany.Component {
         private void ApplyBhop() {
             if (!inAir) {
                 inAir = true;
-                SetVelocityInAir(0.06f);
+                SetVelocityInAir(AIR_VELOCITY_MULTIPLIER);
             }
 
             wantedVelToAdd.y = 0;
@@ -75,11 +75,11 @@ namespace MovementCompany.Component {
             previousForward = CurrentForward();
         }
 
-        private void SetVelocityInAir(float newVel) {
+        private void SetVelocityInAir(float multiplier) {
             Vector3 vel = myPlayer.thisController.velocity;
             vel.y = 0;
 
-            wantedVelToAdd += vel * AIR_VELOCITY_MULTIPLIER;
+            wantedVelToAdd += vel * multiplier;
         }
 
         private Vector3 CurrentForward() {
