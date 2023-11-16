@@ -1,6 +1,7 @@
-﻿using GameNetcodeStuff;
-using System.Numerics;
+using GameNetcodeStuff;
 using UnityEngine;
+
+using Plugin = MovementCompany.Core.MovementCompany;
 
 namespace MovementCompany.Component {
     internal class MovementAdder : MonoBehaviour {

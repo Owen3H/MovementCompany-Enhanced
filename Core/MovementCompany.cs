@@ -1,4 +1,5 @@
 using BepInEx;
+using BepInEx.Logging;
 using HarmonyLib;
 using MovementCompany.Component;
 using UnityEngine;
@@ -6,13 +7,14 @@ using UnityEngine;
 namespace MovementCompany.Core {
     [BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]
     public class MovementCompany : BaseUnityPlugin {
+        public static new ManualLogSource Logger { get; private set; }
         private Harmony _harmony;
-        //public static ManualLogSource Logger { get; private set; }
 
         private void Awake() {
             _harmony = new(Metadata.GUID);
             _harmony.PatchAll();
 
+            Logger = base.Logger;
             Logger.LogInfo($"Loaded plugin: {Metadata.GUID}");
         }
 
