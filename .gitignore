@@ -1,2 +1,7 @@
 obj/
+bin/
+libs/
+libraries/
+
 .vscode/
+.vs/

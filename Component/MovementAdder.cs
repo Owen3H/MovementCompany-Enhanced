@@ -1,24 +1,21 @@
 ﻿using GameNetcodeStuff;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
 using UnityEngine;
 
 namespace MovementCompany.Component {
     internal class MovementAdder : MonoBehaviour {
         public void Update() {
-            PlayerControllerB[] players = GameObject.FindObjectsOfType<PlayerControllerB>();
+            PlayerControllerB[] players = FindObjectsOfType<PlayerControllerB>();
 
-            foreach (PlayerControllerB player in players) {
-                if (player == null) return
-                
-                if (player.gameObject.GetComponentInChildren<MovementScript>() == null) {
-                    if (player.IsOwner && player.isPlayerControlled) {
-                        player.gameObject.AddComponent<MovementScript>().myPlayer = player;
-                        Plugin.Log.LogMessage("Gave player the movement script");
-                    }
+            int playersLen = players.Length;
+            for (int i = 0; i < playersLen; i++) {
+                PlayerControllerB player = players[i];
+                if (player == null) return;
+                if (player.GetComponentInChildren<MovementScript>() != null) return;
+
+                if (player.IsOwner && player.isPlayerControlled) {
+                    player.gameObject.AddComponent<MovementScript>().myPlayer = player;
+                    Plugin.Logger.LogMessage("Gave player the movement script");
                 }
             }
         }
