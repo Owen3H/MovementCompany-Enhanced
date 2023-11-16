@@ -19,7 +19,7 @@ namespace MovementCompany.Component {
         private static readonly float ROTATION_THRESHOLD = 0.01f;
         private static readonly Vector3 newWantedVel = new(0.0005f, 0.0005f, 0.0005f);
 
-        bool inAir;
+        private bool inAir;
 
         public void Update() {
             UpdateJumpTime();
@@ -29,7 +29,7 @@ namespace MovementCompany.Component {
             bool climbing = myPlayer.isClimbingLadder;
 
             if (grounded || climbing) {
-                HandleGrounded(grounded);
+                HandleGrounded();
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace MovementCompany.Component {
             myPlayer.sprintMeter = value;
         }
 
-        private void HandleGrounded(bool grounded) {
+        private void HandleGrounded() {
             // TODO: Evaluate if this can be replaced with fixedDeltaTime.
             float targetVel = Time.deltaTime * GROUND_VELOCITY_MULTIPLIER;
             wantedVelToAdd = Vector3.Lerp(wantedVelToAdd, Vector3.zero, targetVel);
