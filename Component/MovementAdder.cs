@@ -5,7 +5,7 @@ using MovementCompany.Core;
 
 namespace MovementCompany.Component {
     internal class MovementAdder : MonoBehaviour {
-        public void Update() {
+        public void FixedUpdate() {
             PlayerControllerB[] players = FindObjectsOfType<PlayerControllerB>();
 
             int playersLen = players.Length;
@@ -15,7 +15,7 @@ namespace MovementCompany.Component {
                 if (player.GetComponentInChildren<MovementScript>() != null) return;
 
                 if (player.IsOwner && player.isPlayerControlled) {
-                    player.gameObject.AddComponent<MovementScript>().myPlayer = player;
+                    player.gameObject.AddComponent<MovementScript>().player = player;
                     Plugin.Logger.LogMessage("Gave player the movement script");
                 }
             }
