@@ -2,9 +2,10 @@
 A maintained version of 2018's [Movement-Company](https://github.com/u-2018/Movement-Company).<br>
 
 ## Goals
-- Code optimization
+- Code optimization.
 - Remove hardcoded values in favour of a config file.
 - Option for bhopping to drain stamina.
+- Display current Coords + Velocity (like Source).
 - Sliding?
 
 # Installation
