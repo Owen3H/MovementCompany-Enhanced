@@ -1,4 +1,4 @@
-# MovementCompany Enhanced
+# MovementCompany-Enhanced
 A maintained version of 2018's [Movement-Company](https://github.com/u-2018/Movement-Company).<br>
 
 ## Goals
