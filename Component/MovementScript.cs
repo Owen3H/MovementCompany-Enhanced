@@ -11,7 +11,7 @@ namespace MovementCompany.Component {
 
         public static Vector3 wantedVelToAdd;
 
-        private static readonly Vector3 velToAdd = new(0.0003f, 0.0003f, 0.0003f);
+        private static readonly Vector3 velToAdd = new(0.0002f, 0.0002f, 0.0002f);
 
         private Vector3 previousForward;
 
@@ -66,7 +66,7 @@ namespace MovementCompany.Component {
             bool jumping = player.playerBodyAnimator.GetBool("Jumping");
             if (jumping && jumpTime < cfg.MAX_JUMP_DURATION) {
                 player.fallValue = player.jumpForce;
-                jumpTime += Time.deltaTime * cfg.JUMP_TIME_MULTIPLIER;
+                jumpTime += Time.deltaTime / cfg.JUMP_TIME_MULTIPLIER;
             }
         }
 

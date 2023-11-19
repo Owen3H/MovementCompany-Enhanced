@@ -42,17 +42,17 @@ namespace MovementCompany.Core {
                 "The amount at which the sprint meter (aka stamina) is considered full.\nClamped between 0 and 1 in the base game."
             );
 
-            MAX_JUMP_DURATION = NewEntry("fMaxJumpDuration", 0.04f,
-                "The maximum amount of time a jump can last for."
+            MAX_JUMP_DURATION = NewEntry("fMaxJumpDuration", 0.02f,
+                "The maximum amount of time a jump can last for.\n" +
+                "Higher values will cause the player to feel more weightless."
             );
 
-            ROTATION_THRESHOLD = NewEntry("fRotationThreshold", 0.012f,
+            ROTATION_THRESHOLD = NewEntry("fRotationThreshold", 0.0115f,
                 "The magnitude at which to begin applying velocity. Higher = more rotation required."
             );
 
-            JUMP_TIME_MULTIPLIER = NewEntry("fJumpTimeMultiplier", 13f,
-                "The value to multiply the time spent in the air after jumping.\n" +
-                "Lower values will cause the player to feel more weightless."
+            JUMP_TIME_MULTIPLIER = NewEntry("fJumpTimeMultiplier", 1.1f,
+                ""
             );
 
             MAX_AIR_VELOCITY = NewEntry("fMaxAirVelocity", 35f,
@@ -60,7 +60,7 @@ namespace MovementCompany.Core {
                 "AKA. The maximum amount of velocity that can be achieved."
             );
 
-            FORWARD_VELOCITY_DAMPER = NewEntry("fForwardVelocityDamper", 1.4f, 
+            FORWARD_VELOCITY_DAMPER = NewEntry("fForwardVelocityDamper", 1.6f, 
                 "After jumping, a forward velocity is applied - which is first dampened by this value.\n" +
                 "Note: Increasing this value too much may hinder bhopping."
             );
@@ -70,7 +70,7 @@ namespace MovementCompany.Core {
                 "Note: Do not let the small value fool you, anything above the default is veryy fast!"
             );
 
-            GROUND_VELOCITY_MULTIPLIER = NewEntry("fGroundVelocityMultiplier", 2.4f,
+            GROUND_VELOCITY_MULTIPLIER = NewEntry("fGroundVelocityMultiplier", 2.3f,
                 "The value to multiply inverse velocity by when not airborne.\n" +
                 "Essentially, this effects how much the player is slowed down when hitting the ground."
             );
