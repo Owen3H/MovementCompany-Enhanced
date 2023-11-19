@@ -10,7 +10,7 @@ namespace MovementCompany.Patches {
         [HarmonyPatch("PlayerJump")]
         public static IEnumerator OverridePlayerJump(IEnumerable result) {
             foreach(var e in result) {
-                if (e is WaitForSeconds) {
+                if (e is not WaitForSeconds) {
                     yield return e;
                 }
             }
