@@ -42,25 +42,24 @@ namespace MovementCompany.Core {
                 "The amount at which the sprint meter (aka stamina) is considered full.\nClamped between 0 and 1 in the base game."
             );
 
-            MAX_JUMP_DURATION = NewEntry("fMaxJumpDuration", 0.02f,
-                "The maximum amount of time a jump can last for.\n" +
-                "Higher values will cause the player to feel more weightless."
+            MAX_JUMP_DURATION = NewEntry("fMaxJumpDuration", 0.008f,
+                "The maximum amount of time a jump can last for."
             );
 
-            ROTATION_THRESHOLD = NewEntry("fRotationThreshold", 0.0115f,
+            ROTATION_THRESHOLD = NewEntry("fRotationThreshold", 0.011f,
                 "The magnitude at which to begin applying velocity. Higher = more rotation required."
             );
 
-            JUMP_TIME_MULTIPLIER = NewEntry("fJumpTimeMultiplier", 1.1f,
-                ""
+            JUMP_TIME_MULTIPLIER = NewEntry("fJumpTimeMultiplier", 35f,
+                "The value to multiply 'jump time' by, affecting how quickly you hit MaxJumpDuration.\n" +
+                "Lower values will cause the player to feel more weightless."
             );
 
-            MAX_AIR_VELOCITY = NewEntry("fMaxAirVelocity", 35f,
-                "The value at which velocity will stop being applied when airborne.\n" +
-                "AKA. The maximum amount of velocity that can be achieved."
+            MAX_AIR_VELOCITY = NewEntry("fMaxAirVelocity", 40f,
+                "The value at which velocity will stop being applied when airborne."
             );
 
-            FORWARD_VELOCITY_DAMPER = NewEntry("fForwardVelocityDamper", 1.6f, 
+            FORWARD_VELOCITY_DAMPER = NewEntry("fForwardVelocityDamper", 1.7f, 
                 "After jumping, a forward velocity is applied - which is first dampened by this value.\n" +
                 "Note: Increasing this value too much may hinder bhopping."
             );
@@ -70,9 +69,9 @@ namespace MovementCompany.Core {
                 "Note: Do not let the small value fool you, anything above the default is veryy fast!"
             );
 
-            GROUND_VELOCITY_MULTIPLIER = NewEntry("fGroundVelocityMultiplier", 2.3f,
+            GROUND_VELOCITY_MULTIPLIER = NewEntry("fGroundVelocityMultiplier", 1.6f,
                 "The value to multiply inverse velocity by when not airborne.\n" +
-                "Essentially, this effects how much the player is slowed down when hitting the ground."
+                "Essentially, this affects how much the player is slowed down when hitting the ground."
             );
 
             SINK_SPEED_MULTIPLIER = NewEntry("fSinkSpeedMultiplier", 0.16f,
@@ -84,7 +83,7 @@ namespace MovementCompany.Core {
                 "The base speed at which the player moves. This is NOT a multiplier."
             );
 
-            CLIMB_SPEED = NewEntry("fClimbSpeed", 3.7f,
+            CLIMB_SPEED = NewEntry("fClimbSpeed", 3.9f,
                 "The base speed at which the player climbs. This is NOT a multiplier."
             );
         }

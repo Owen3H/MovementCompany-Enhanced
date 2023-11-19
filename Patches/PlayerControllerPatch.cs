@@ -1,12 +1,19 @@
 using GameNetcodeStuff;
 using HarmonyLib;
+using System.Collections;
+using UnityEngine;
 
 namespace MovementCompany.Patches {
+    [HarmonyPatch(typeof(PlayerControllerB))]
     class PlayerControllerPatch {
-        //[HarmonyPatch(typeof(PlayerControllerB))]
-        //[HarmonyPatch("DamagePlayer")]
-        //public static void Prefix(ref PlayerControllerB __instance) {
-        //    return;
-        //}
+        [HarmonyPrefix]
+        [HarmonyPatch("PlayerJump")]
+        public static IEnumerator OverridePlayerJump(IEnumerable result) {
+            foreach(var e in result) {
+                if (e is WaitForSeconds) {
+                    yield return e;
+                }
+            }
+        }
     }
 }

@@ -66,7 +66,7 @@ namespace MovementCompany.Component {
             bool jumping = player.playerBodyAnimator.GetBool("Jumping");
             if (jumping && jumpTime < cfg.MAX_JUMP_DURATION) {
                 player.fallValue = player.jumpForce;
-                jumpTime += Time.deltaTime / cfg.JUMP_TIME_MULTIPLIER;
+                jumpTime += Time.deltaTime / 100 * cfg.JUMP_TIME_MULTIPLIER;
             }
         }
 

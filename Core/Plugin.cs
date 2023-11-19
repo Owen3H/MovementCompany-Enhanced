@@ -10,7 +10,7 @@ namespace MovementCompany.Core {
         public static new ManualLogSource Logger { get; private set; }
         public static new PluginConfig Config { get; private set; }
 
-        private Harmony _harmony;
+        private Harmony patcher;
 
         private void Awake() {
             Logger = base.Logger;
@@ -20,8 +20,8 @@ namespace MovementCompany.Core {
 
             Config.InitBindings();
 
-            _harmony = new(Metadata.GUID);
-            _harmony.PatchAll();
+            patcher = new(Metadata.GUID);
+            patcher.PatchAll();
 
             Logger.LogInfo($"Loaded plugin: {Metadata.GUID}");
         }
