@@ -5,12 +5,20 @@ namespace MovementCompany.Core {
         readonly ConfigFile configFile;
 
         public bool PLUGIN_ENABLED { get; private set; }
+        public bool DISPLAY_DEBUG_INFO { get; private set; }
         public bool BHOP_CONSUMES_STAMINA { get; private set; }
+
         public float MAX_STAMINA { get; private set; }
-        public float JUMP_TIME_MULTIPLIER { get; private set; }
-        public float GROUND_VELOCITY_MULTIPLIER { get; private set; }
-        public float AIR_VELOCITY_MULTIPLIER { get; private set; }
+        public float MAX_JUMP_DURATION { get; private set; }
         public float ROTATION_THRESHOLD { get; private set; }
+        public float JUMP_TIME_MULTIPLIER { get; private set; }
+        public float MAX_AIR_VELOCITY { get; private set; }
+        public float FORWARD_VELOCITY_DAMPER { get; private set; } 
+        public float AIR_VELOCITY_MULTIPLIER { get; private set; }
+        public float GROUND_VELOCITY_MULTIPLIER { get; private set; }
+        public float SINK_SPEED_MULTIPLIER { get; private set; }
+        public float MOVEMENT_SPEED { get; private set; }
+        public float CLIMB_SPEED { get; private set; }
 
         public PluginConfig(ConfigFile cfg) {
             configFile = cfg;
@@ -22,27 +30,62 @@ namespace MovementCompany.Core {
         }
 
         public void InitBindings() {
-            JUMP_TIME_MULTIPLIER = NewEntry("fJumpTimeMultiplier", 9.6f,
-                ""
+            DISPLAY_DEBUG_INFO = NewEntry("bDisplayDebugInfo", true, "Whether to display coordinates, velocity and other debug info.");
+
+            BHOP_CONSUMES_STAMINA = NewEntry("bBhopConsumesStamina", false, 
+                "Whether bhopping will use stamina (see MAX_STAMINA).\n" +
+                "Note: THIS LIKELY DOESNT WORK CORRECTLY RIGHT NOW."
             );
 
-            GROUND_VELOCITY_MULTIPLIER = NewEntry("fGroundVelocityMultiplier", 4.2f,
-                ""
+            // Native sprint meter is clamped between 0 and 1.
+            MAX_STAMINA = NewEntry("fMaxStamina", 200f,
+                "The amount at which the sprint meter (aka stamina) is considered full.\nClamped between 0 and 1 in the base game."
             );
 
-            AIR_VELOCITY_MULTIPLIER = NewEntry("fAirVelocityMultiplier", 0.0045f,
-                "The value to multiply velocity by when in the air."
+            MAX_JUMP_DURATION = NewEntry("fMaxJumpDuration", 0.04f,
+                "The maximum amount of time a jump can last for."
             );
 
-            ROTATION_THRESHOLD = NewEntry("fRotationThreshold", 0.013f,
+            ROTATION_THRESHOLD = NewEntry("fRotationThreshold", 0.012f,
                 "The magnitude at which to begin applying velocity. Higher = more rotation required."
             );
 
-            BHOP_CONSUMES_STAMINA = NewEntry("bBhopConsumesStamina", true, "");
+            JUMP_TIME_MULTIPLIER = NewEntry("fJumpTimeMultiplier", 13f,
+                "The value to multiply the time spent in the air after jumping.\n" +
+                "Lower values will cause the player to feel more weightless."
+            );
 
-            // Native sprint meter is clamped between 0 and 1.
-            MAX_STAMINA = NewEntry("fMaxStamina", 20f,
-                "The amount at which the sprint meter (aka stamina) is considered full.\nClamped between 0 and 1 in the base game."
+            MAX_AIR_VELOCITY = NewEntry("fMaxAirVelocity", 35f,
+                "The value at which velocity will stop being applied when airborne.\n" +
+                "AKA. The maximum amount of velocity that can be achieved."
+            );
+
+            FORWARD_VELOCITY_DAMPER = NewEntry("fForwardVelocityDamper", 1.4f, 
+                "After jumping, a forward velocity is applied - which is first dampened by this value.\n" +
+                "Note: Increasing this value too much may hinder bhopping."
+            );
+
+            AIR_VELOCITY_MULTIPLIER = NewEntry("fAirVelocityMultiplier", 0.004f,
+                "The value to multiply the player's velocity by when airborne.\n" +
+                "Note: Do not let the small value fool you, anything above the default is veryy fast!"
+            );
+
+            GROUND_VELOCITY_MULTIPLIER = NewEntry("fGroundVelocityMultiplier", 2.4f,
+                "The value to multiply inverse velocity by when not airborne.\n" +
+                "Essentially, this effects how much the player is slowed down when hitting the ground."
+            );
+
+            SINK_SPEED_MULTIPLIER = NewEntry("fSinkSpeedMultiplier", 0.16f,
+                "Value to multiply the sinking speed by when in quicksand.\n"+
+                "Don't want to sink as fast? Decrease this value."
+            );
+
+            MOVEMENT_SPEED = NewEntry("fMovementSpeed", 4.2f,
+                "The base speed at which the player moves. This is NOT a multiplier."
+            );
+
+            CLIMB_SPEED = NewEntry("fClimbSpeed", 3.7f,
+                "The base speed at which the player climbs. This is NOT a multiplier."
             );
         }
     }

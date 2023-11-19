@@ -16,7 +16,7 @@ namespace MovementCompany.Core {
             Logger = base.Logger;
             Config = new(base.Config);
 
-            if (CheckPluginDisabled(true)) return;
+            if (!PluginEnabled(true)) return;
 
             Config.InitBindings();
 
@@ -27,20 +27,22 @@ namespace MovementCompany.Core {
         }
 
         public void OnDestroy() {
-            if (CheckPluginDisabled()) return;
+            if (!PluginEnabled()) return;
 
-            GameObject gameObject = new("MovementAdder");
-            DontDestroyOnLoad(gameObject);
-            gameObject.AddComponent<MovementAdder>();
+            GameObject movementObj = new("MovementAdder");
+            movementObj.AddComponent<MovementAdder>();
+            DontDestroyOnLoad(movementObj);
 
             LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
         }
 
-        public bool CheckPluginDisabled(bool log = false) {
+        public bool PluginEnabled(bool logDisabled = false) {
             bool enabled = Config.PLUGIN_ENABLED;
-            if (!enabled && log) Logger.LogInfo("MovementCompany disabled globally.");
+            if (!enabled && logDisabled) {
+                Logger.LogInfo("MovementCompany disabled globally.");
+            }
 
-            return !enabled;
+            return enabled;
         }
     }
 }
