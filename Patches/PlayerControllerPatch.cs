@@ -1,13 +1,15 @@
 using GameNetcodeStuff;
 using HarmonyLib;
+using MovementCompany.Core;
 using System.Collections;
 using UnityEngine;
 
 namespace MovementCompany.Patches {
     [HarmonyPatch(typeof(PlayerControllerB))]
-    class PlayerControllerPatch {
+    internal class PlayerControllerPatch {
+        [HarmonyPostfix]
         [HarmonyPatch("PlayerJump")]
-        public static IEnumerator Postfix(IEnumerator __result) {
+        public static IEnumerator PlayerJumpPatch(IEnumerator __result) {
             while (__result.MoveNext()) {
                 var cur = __result.Current;
                 if (cur is not WaitForSeconds) {
@@ -15,5 +17,11 @@ namespace MovementCompany.Patches {
                 }
             }
         }
+
+        //[HarmonyPostfix]
+        //[HarmonyPatch("SpawnPlayerAnimation")]
+        //public static void SpawnPlayerPatch() {
+
+        //}
     }
 }
