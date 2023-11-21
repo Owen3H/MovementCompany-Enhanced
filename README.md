@@ -1,11 +1,15 @@
 # MovementCompany-Enhanced
 A maintained version of 2018's [Movement-Company](https://github.com/u-2018/Movement-Company).<br>
+PRs welcome :)
+
+## Changes
+- Hardcoded values were replaced with a config file found in `BepInEx/config`. (Generated when the game launches)
+- Current coords + velocity now displayed. To turn it off, set `bDisplayDebugInfo` to `false`.
 
 ## Goals
-- [**In Progress**] Code optimization.
-- [**In Progress**] Remove hardcoded values in favour of a config file.
-- [**In Progress**] Display current Coords + Velocity (like Source).
+- [**In Progress**] Optimize code and improve maintainability.
 - Option for bhopping to drain stamina.
+- Air crouching
 - Sliding?
 
 # Installation
