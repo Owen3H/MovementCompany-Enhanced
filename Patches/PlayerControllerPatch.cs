@@ -22,20 +22,14 @@ namespace MovementCompany.Patches
 
         [HarmonyPostfix]
         [HarmonyPatch("SpawnPlayerAnimation")]
-        public static void SpawnPlayerPatch() {
-            PlayerControllerB[] Players = Object.FindObjectsOfType<PlayerControllerB>();
-            int PlayersAmt = Players.Length;
+        public static void SpawnPlayerPatch(PlayerControllerB __instance) {
+            if (__instance.GetComponentInChildren<CustomMovement>() != null) 
+                return;
 
-            for (int i = 0; i < PlayersAmt; i++) {
-                PlayerControllerB player = Players[i];
-
-                if (player == null) return;
-                if (player.GetComponentInChildren<CustomMovement>() != null) return;
-
-                if (player.IsOwner && player.isPlayerControlled) {
-                    player.gameObject.AddComponent<CustomMovement>().player = player;
-                    Plugin.Logger.LogMessage($"Gave {player.playerUsername} the movement script.");
-                }
+            PlayerControllerB player = __instance;
+            if (player.IsOwner && __instance.isPlayerControlled) {
+                player.gameObject.AddComponent<CustomMovement>().player = __instance;
+                Plugin.Logger.LogInfo("Client player was given the movement script.");
             }
         }
     }
