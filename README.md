@@ -18,7 +18,7 @@ PRs welcome :)
 - Current coords + velocity now displayed. To turn it off, set `bDisplayDebugInfo` to `false`.
 - Improved maintainability.
     - Re-organized project and made use of abstraction with aptly named methods.
-    - Plugin metadata now has its own class - no longer hidden in `/bin`.
+    - Plugin metadata now has its own class - no longer hidden deep in `/obj/../../`.
     - Made it easier to PR (post-build event, gitignore)
 - Code optimizations.
     - MovementAdder removed. Movement script is now given on player spawn instead of each frame.
