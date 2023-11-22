@@ -36,11 +36,6 @@ namespace MovementCompany.Core {
 
         public void OnDestroy() {
             if (!PluginEnabled()) return;
-
-            GameObject movementObj = new("MovementAdder");
-            movementObj.AddComponent<MovementAdder>();
-            DontDestroyOnLoad(movementObj);
-
             LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
         }
 
