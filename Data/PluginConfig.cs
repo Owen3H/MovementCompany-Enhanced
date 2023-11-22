@@ -6,7 +6,8 @@ namespace MovementCompanyEnhanced.Core {
 
         public bool PLUGIN_ENABLED { get; private set; }
         public bool DISPLAY_DEBUG_INFO { get; private set; }
-        public bool BHOP_CONSUMES_STAMINA { get; private set; }
+
+        public bool INFINITE_STAMINA { get; private set; }
 
         public float MAX_STAMINA { get; private set; }
         public float MAX_JUMP_DURATION { get; private set; }
@@ -32,9 +33,21 @@ namespace MovementCompanyEnhanced.Core {
         public void InitBindings() {
             DISPLAY_DEBUG_INFO = NewEntry("bDisplayDebugInfo", true, "Whether to display coordinates, velocity and other debug info.");
 
-            BHOP_CONSUMES_STAMINA = NewEntry("bBhopConsumesStamina", false, 
-                "Whether bhopping will use stamina (see MAX_STAMINA).\n" +
-                "Note: THIS LIKELY DOESNT WORK CORRECTLY RIGHT NOW."
+            //WALK_CONSUMES_STAMINA = NewEntry("bJumpConsumesStamina", false, 
+            //    "Whether walking costs the player some of their stamina."
+            //);
+
+            //SPRINT_CONSUMES_STAMINA = NewEntry("bJumpConsumesStamina", false,
+            //    "Whether sprinting costs the player some of their stamina."
+            //);
+
+            //JUMP_CONSUMES_STAMINA = NewEntry("bJumpConsumesStamina", false, 
+            //    "Whether jumping costs the player some of their stamina."
+            //);            
+
+            INFINITE_STAMINA = NewEntry("bInfiniteStamina", true,
+                "Whether the player has infinite stamina (essential for bhopping).\n" +
+                "THIS WILL BE REPLACED IN A FUTURE UPDATE."
             );
 
             // Native sprint meter is clamped between 0 and 1.
@@ -42,7 +55,7 @@ namespace MovementCompanyEnhanced.Core {
                 "The amount at which the sprint meter (aka stamina) is considered full.\nClamped between 0 and 1 in the base game."
             );
 
-            MAX_JUMP_DURATION = NewEntry("fMaxJumpDuration", 0.008f,
+            MAX_JUMP_DURATION = NewEntry("fMaxJumpDuration", 0.0015f,
                 "The maximum amount of time a jump can last for."
             );
 
@@ -50,7 +63,7 @@ namespace MovementCompanyEnhanced.Core {
                 "The magnitude at which to begin applying velocity. Higher = more rotation required."
             );
 
-            JUMP_TIME_MULTIPLIER = NewEntry("fJumpTimeMultiplier", 35f,
+            JUMP_TIME_MULTIPLIER = NewEntry("fJumpTimeMultiplier", 38f,
                 "The value to multiply 'jump time' by, affecting how quickly you hit MaxJumpDuration.\n" +
                 "Lower values will cause the player to feel more weightless."
             );
@@ -59,17 +72,17 @@ namespace MovementCompanyEnhanced.Core {
                 "The value at which velocity will stop being applied when airborne."
             );
 
-            FORWARD_VELOCITY_DAMPER = NewEntry("fForwardVelocityDamper", 1.7f, 
+            FORWARD_VELOCITY_DAMPER = NewEntry("fForwardVelocityDamper", 2.5f, 
                 "After jumping, a forward velocity is applied - which is first dampened by this value.\n" +
                 "Note: Increasing this value too much may hinder bhopping."
             );
 
-            AIR_VELOCITY_MULTIPLIER = NewEntry("fAirVelocityMultiplier", 0.004f,
+            AIR_VELOCITY_MULTIPLIER = NewEntry("fAirVelocityMultiplier", 0.005f,
                 "The value to multiply the player's velocity by when airborne.\n" +
                 "Note: Do not let the small value fool you, anything above the default is veryy fast!"
             );
 
-            GROUND_VELOCITY_MULTIPLIER = NewEntry("fGroundVelocityMultiplier", 1.6f,
+            GROUND_VELOCITY_MULTIPLIER = NewEntry("fGroundVelocityMultiplier", 1.1f,
                 "The value to multiply inverse velocity by when not airborne.\n" +
                 "Essentially, this affects how much the player is slowed down when hitting the ground."
             );

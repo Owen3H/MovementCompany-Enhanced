@@ -43,12 +43,14 @@ namespace MovementCompanyEnhanced.Component {
         }
 
         public void Update() {
-            UpdateJumpTime();
+            bool jumping = player.playerBodyAnimator.GetBool("Jumping");
 
             // Allows infinite bhopping by keeping the "sprint meter" full.
-            if (!cfg.BHOP_CONSUMES_STAMINA) {
+            if (cfg.INFINITE_STAMINA) {
                 SetStamina(cfg.MAX_STAMINA);
             }
+
+            UpdateJumpTime(jumping);
 
             // No longer in air, slowly decrease velocity.
             if (!Airborne()) {
@@ -56,29 +58,29 @@ namespace MovementCompanyEnhanced.Component {
                 return;
             }
 
-            if (ReachedMaxVelocity()) return;
-            ApplyBhop();
+            if (!ReachedMaxVelocity()) {
+                ApplyBhop();
+            }
         }
 
         public void ApplyConfigSpeeds() {
             player.movementSpeed = ValNonNegative(cfg.MOVEMENT_SPEED);
             player.climbSpeed = ValNonNegative(cfg.CLIMB_SPEED);
-
-            // TODO: Fix this broken shit
-            //player.sinkingSpeedMultiplier = ValNonNegative(cfg.SINK_SPEED_MULTIPLIER);
+            player.sinkingSpeedMultiplier = ValNonNegative(cfg.SINK_SPEED_MULTIPLIER);
         }
 
-        public void UpdateJumpTime() {
-            bool jumping = player.playerBodyAnimator.GetBool("Jumping");
+        public void UpdateJumpTime(bool jumping) {
             if (jumping && jumpTime < cfg.MAX_JUMP_DURATION) {
+                Plugin.Logger.LogDebug("Updating jump time");
+
                 player.fallValue = player.jumpForce;
-                jumpTime += Time.deltaTime / 100 * cfg.JUMP_TIME_MULTIPLIER;
+                jumpTime += Time.deltaTime * cfg.JUMP_TIME_MULTIPLIER / 100;
             }
         }
 
         public void LerpToGround() {
-            float targetVel = Time.deltaTime * cfg.GROUND_VELOCITY_MULTIPLIER;
-            wantedVelToAdd = Vector3.Lerp(wantedVelToAdd, Vector3.zero, targetVel);
+            float timeToGround = Time.deltaTime * cfg.GROUND_VELOCITY_MULTIPLIER;
+            wantedVelToAdd = Vector3.Lerp(wantedVelToAdd, Vector3.zero, timeToGround);
 
             inAir = false;
             jumpTime = 0;
@@ -115,12 +117,7 @@ namespace MovementCompanyEnhanced.Component {
         }
 
         public bool Airborne() {
-            if (player.thisController.isGrounded) return false;
-            if (player.isSinking) return false;
-            if (player.isUnderwater) return false;
-            if (player.isClimbingLadder) return false;
-
-            return true;
+            return !player.thisController.isGrounded && !player.isClimbingLadder;
         }
 
         public void MovePlayer(Vector3 motion) {
