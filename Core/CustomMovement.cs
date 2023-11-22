@@ -1,10 +1,12 @@
 using GameNetcodeStuff;
 using MovementCompany.Core;
+using MovementCompanyEnhanced.Core;
 using System;
 using UnityEngine;
 
-namespace MovementCompany.Component {
-    internal class MovementScript : MonoBehaviour {
+namespace MovementCompany.Component
+{
+    internal class CustomMovement : MonoBehaviour {
         public PlayerControllerB player;
 
         private PluginConfig cfg;

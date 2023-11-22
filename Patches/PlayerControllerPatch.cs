@@ -1,11 +1,12 @@
 using GameNetcodeStuff;
 using HarmonyLib;
 using MovementCompany.Component;
-using MovementCompany.Core;
+using MovementCompanyEnhanced.Core;
 using System.Collections;
 using UnityEngine;
 
-namespace MovementCompany.Patches {
+namespace MovementCompany.Patches
+{
     [HarmonyPatch(typeof(PlayerControllerB))]
     internal class PlayerControllerPatch {
         [HarmonyPostfix]
@@ -29,10 +30,10 @@ namespace MovementCompany.Patches {
                 PlayerControllerB player = Players[i];
 
                 if (player == null) return;
-                if (player.GetComponentInChildren<MovementScript>() != null) return;
+                if (player.GetComponentInChildren<CustomMovement>() != null) return;
 
                 if (player.IsOwner && player.isPlayerControlled) {
-                    player.gameObject.AddComponent<MovementScript>().player = player;
+                    player.gameObject.AddComponent<CustomMovement>().player = player;
                     Plugin.Logger.LogMessage($"Gave {player.playerUsername} the movement script.");
                 }
             }
