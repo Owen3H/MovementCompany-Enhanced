@@ -4,8 +4,8 @@ PRs welcome :)
 
 # Installation
 1. Install [BepInEx](https://github.com/BepInEx/BepInEx/releases) v5 into your game.
-2. Install [LC_API](https://thunderstore.io/c/lethal-company/p/2018/LC_API/) into your game.
-3. Download `MovementCompanyEnhanced.dll` and put it into `Lethal Company\BepInEx\plugins`.
+2. Install the [LC API](https://thunderstore.io/c/lethal-company/p/2018/LC_API/) into your game.
+3. Download `MovementCompanyEnhanced.dll` and drop it into `Lethal Company\BepInEx\plugins`.
 
 ## Goals
 - [**In Progress**] Remove jump delay.
