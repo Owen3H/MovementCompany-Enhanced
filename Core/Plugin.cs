@@ -1,13 +1,13 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using MovementCompany.Component;
+using MovementCompany.Core;
 using MovementCompany.Patches;
-using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using UnityEngine;
 
-namespace MovementCompany.Core {
+namespace MovementCompanyEnhanced.Core {
     [BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]
     public class Plugin : BaseUnityPlugin {
         internal static new ManualLogSource Logger { get; private set; }
@@ -23,20 +23,27 @@ namespace MovementCompany.Core {
 
             Config.InitBindings();
 
-            patcher = new(Metadata.GUID);
-            patcher.PatchAll(typeof(PlayerControllerPatch));
-           
-            Logger.LogInfo($"Loaded plugin: {Metadata.GUID}");
-
-            IEnumerable patches = patcher.GetPatchedMethods();
-            foreach (MethodBase patch in patches) {
-                Logger.LogInfo($"Patched {patch.Name}");
-            }
+            InitPatcher();
+            Logger.LogInfo("Plugin loaded.");
         }
 
         public void OnDestroy() {
             if (!PluginEnabled()) return;
             LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
+        }
+
+        private void InitPatcher() {
+            patcher = new(Metadata.GUID);
+            patcher.PatchAll(typeof(PlayerControllerPatch));
+
+            LogPatches();
+        }
+
+        public void LogPatches() {
+            IEnumerable<MethodBase> patches = patcher.GetPatchedMethods();
+            string str = string.Join(", ", patches.ToList());
+
+            Logger.LogInfo("Applied patches to: " + str);
         }
 
         public bool PluginEnabled(bool logIfDisabled = false) {
