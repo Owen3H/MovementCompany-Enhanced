@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>MovementCompanyEnhanced</AssemblyName>
-    <Description>Source moment</Description>
+    <Description>General purpose movement mod, fully configurable and allows bhopping.</Description>
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>

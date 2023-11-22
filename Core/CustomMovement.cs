@@ -1,11 +1,9 @@
 using GameNetcodeStuff;
-using MovementCompany.Core;
 using MovementCompanyEnhanced.Core;
 using System;
 using UnityEngine;
 
-namespace MovementCompany.Component
-{
+namespace MovementCompanyEnhanced.Component {
     internal class CustomMovement : MonoBehaviour {
         public PlayerControllerB player;
 
@@ -38,6 +36,10 @@ namespace MovementCompany.Component
         public void Start() {
             cfg = Plugin.Config;
             ApplyConfigSpeeds();
+
+            // Player is spawned slightly in the air, ground them so their
+            // velocity wont increase and cause them to fly around the ship.
+            MovePlayer(0, -0.5f, 0);
         }
 
         public void Update() {
@@ -61,7 +63,9 @@ namespace MovementCompany.Component
         public void ApplyConfigSpeeds() {
             player.movementSpeed = ValNonNegative(cfg.MOVEMENT_SPEED);
             player.climbSpeed = ValNonNegative(cfg.CLIMB_SPEED);
-            player.sinkingSpeedMultiplier = ValNonNegative(cfg.SINK_SPEED_MULTIPLIER);
+
+            // TODO: Fix this broken shit
+            //player.sinkingSpeedMultiplier = ValNonNegative(cfg.SINK_SPEED_MULTIPLIER);
         }
 
         public void UpdateJumpTime() {
@@ -87,8 +91,8 @@ namespace MovementCompany.Component
             }
 
             wantedVelToAdd.y = 0;
-            player.thisController.Move(CurrentForward() * (wantedVelToAdd.magnitude / cfg.FORWARD_VELOCITY_DAMPER));
 
+            MovePlayer(CurrentForward() * (wantedVelToAdd.magnitude / cfg.FORWARD_VELOCITY_DAMPER));
             AddRotationVelocity(cfg.ROTATION_THRESHOLD);
         }
 
@@ -119,6 +123,14 @@ namespace MovementCompany.Component
             return true;
         }
 
+        public void MovePlayer(Vector3 motion) {
+            player.thisController.Move(motion);
+        }
+
+        public void MovePlayer(float x, float y, float z) {
+            player.thisController.Move(new Vector3(x, y, z));
+        }
+
         public Vector3 CurrentForward() {
             return player.gameObject.transform.forward;
         }
@@ -144,7 +156,7 @@ namespace MovementCompany.Component
             return newVal;
         }
 
-        public String Vec3ToString(Vector3 vec) {
+        public string Vec3ToString(Vector3 vec) {
             float x = (float) Math.Round(vec.x, 1);
             float y = (float) Math.Round(vec.y, 1);
             float z = (float) Math.Round(vec.z, 1);

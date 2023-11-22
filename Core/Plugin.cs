@@ -1,11 +1,10 @@
-using BepInEx;
-using BepInEx.Logging;
-using HarmonyLib;
-using MovementCompany.Core;
-using MovementCompany.Patches;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BepInEx;
+using BepInEx.Logging;
+using HarmonyLib;
+using MovementCompanyEnhanced.Patches;
 
 namespace MovementCompanyEnhanced.Core {
     [BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]

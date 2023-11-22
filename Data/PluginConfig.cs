@@ -1,6 +1,6 @@
 using BepInEx.Configuration;
 
-namespace MovementCompany.Core {
+namespace MovementCompanyEnhanced.Core {
     public class PluginConfig {
         readonly ConfigFile configFile;
 

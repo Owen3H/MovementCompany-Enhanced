@@ -1,12 +1,11 @@
 using GameNetcodeStuff;
 using HarmonyLib;
-using MovementCompany.Component;
+using MovementCompanyEnhanced.Component;
 using MovementCompanyEnhanced.Core;
 using System.Collections;
 using UnityEngine;
 
-namespace MovementCompany.Patches
-{
+namespace MovementCompanyEnhanced.Patches {
     [HarmonyPatch(typeof(PlayerControllerB))]
     internal class PlayerControllerPatch {
         [HarmonyPostfix]
@@ -23,6 +22,10 @@ namespace MovementCompany.Patches
         [HarmonyPostfix]
         [HarmonyPatch("SpawnPlayerAnimation")]
         public static void SpawnPlayerPatch(PlayerControllerB __instance) {
+            // Shouldn't ever happen here but just in-case.
+            if (__instance == null)
+                return;
+
             if (__instance.GetComponentInChildren<CustomMovement>() != null) 
                 return;
 
