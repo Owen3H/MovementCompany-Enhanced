@@ -14,7 +14,8 @@ PRs welcome :)
 - Sliding?
   
 ## Changelog
-- Hardcoded values were replaced with a config file found in `BepInEx/config`. (Generated when the game launches)
+- Hardcoded values were replaced with a config file.
+  > Automatically generated at `BepInEx/config` when the game launches.
 - Current coords + velocity now displayed. To turn it off, set `bDisplayDebugInfo` to `false`.
 - Improved maintainability.
     - Re-organized project and made use of abstraction with aptly named methods.
