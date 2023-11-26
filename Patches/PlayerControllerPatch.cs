@@ -24,10 +24,8 @@ namespace MovementCompanyEnhanced.Patches {
                 #region Replace `new WaitForSeconds(float32)` with `null`
                 var op = curInstruction.operand as ConstructorInfo;
                 if (op?.DeclaringType == typeof(WaitForSeconds)) {
-                    // Override with empty instruction.
+                    // Equivalent to `yield return null`
                     patchedInstructions[i] = new CodeInstruction(OpCodes.Ldnull);
-
-                    // Delete unneeded float instruction.
                     patchedInstructions.RemoveAt(i-1);
                     i--;
                 }
