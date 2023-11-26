@@ -27,10 +27,11 @@ namespace MovementCompanyEnhanced.Component {
 
             GUI.Label(new Rect(10, 40, 500, 500), "Current Velocity: " + Math.Round(CurrentVelocity(), 3));
             GUI.Label(new Rect(10, 60, 500, 500), "Wanted Velocity: " + Math.Round(wantedVelToAdd.magnitude, 3));
-            GUI.Label(new Rect(10, 80, 500, 500), "Reached Max Velocity: " + ReachedMaxVelocity());
+            //GUI.Label(new Rect(10, 80, 500, 500), "Reached Max Velocity: " + ReachedMaxVelocity());
 
-            GUI.Label(new Rect(10, 120, 500, 500), "Airborne: " + Airborne());
-            GUI.Label(new Rect(10, 140, 500, 500), "Jump Time: " + jumpTime);
+            GUI.Label(new Rect(10, 90, 500, 500), "Jump Time: " + jumpTime);
+            GUI.Label(new Rect(10, 110, 500, 500), "Airborne: " + inAir);
+            GUI.Label(new Rect(10, 130, 500, 500), "Airborne (Actual): " + Airborne());
         }
 
         public void Start() {
@@ -94,7 +95,10 @@ namespace MovementCompanyEnhanced.Component {
 
             wantedVelToAdd.y = 0;
 
+            // TODO: Check if player is walking/sprinting before doing this.
+            // Currently, stationary jumping will move them forward :/
             MovePlayer(CurrentForward() * (wantedVelToAdd.magnitude / cfg.FORWARD_VELOCITY_DAMPER));
+            
             AddRotationVelocity(cfg.ROTATION_THRESHOLD);
         }
 
@@ -102,7 +106,9 @@ namespace MovementCompanyEnhanced.Component {
             Vector3 vel = player.thisController.velocity;
             vel.y = 0;
 
-            wantedVelToAdd += vel * multiplier;
+            if (wantedVelToAdd.magnitude < 0.2f) {
+                wantedVelToAdd += vel * multiplier;
+            }
         }
 
         public void AddRotationVelocity(float threshold) {
