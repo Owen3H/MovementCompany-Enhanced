@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -22,8 +23,12 @@ namespace MovementCompanyEnhanced.Core {
 
             Config.InitBindings();
 
-            InitPatcher();
-            Logger.LogInfo("Plugin loaded.");
+            try {
+                InitPatcher();
+                Logger.LogInfo("Plugin loaded.");
+            } catch(Exception e) {
+                Logger.LogError(e);
+            }
         }
 
         public void OnDestroy() {
