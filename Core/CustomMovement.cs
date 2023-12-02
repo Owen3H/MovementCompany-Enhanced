@@ -7,7 +7,7 @@ namespace MovementCompanyEnhanced.Component {
     internal class CustomMovement : MonoBehaviour {
         public PlayerControllerB player;
 
-        private PluginConfig cfg;
+        private Config cfg;
 
         public static Vector3 wantedVelToAdd;
 
@@ -44,6 +44,14 @@ namespace MovementCompanyEnhanced.Component {
         }
 
         public void Update() {
+            if (player.isInHangarShipRoom && !Plugin.Config.BHOP_IN_SHIP) {
+                return;
+            }
+
+            if (player.isInsideFactory && !Plugin.Config.BHOP_IN_FACTORY) {
+                return;
+            }
+
             bool jumping = player.playerBodyAnimator.GetBool("Jumping");
 
             // Allows infinite bhopping by keeping the "sprint meter" full.
@@ -98,7 +106,6 @@ namespace MovementCompanyEnhanced.Component {
             // TODO: Check if player is walking/sprinting before doing this.
             // Currently, stationary jumping will move them forward :/
             MovePlayer(CurrentForward() * (wantedVelToAdd.magnitude / cfg.FORWARD_VELOCITY_DAMPER));
-            
             AddRotationVelocity(cfg.ROTATION_THRESHOLD);
         }
 

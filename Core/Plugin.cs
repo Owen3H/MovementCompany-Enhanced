@@ -5,13 +5,12 @@ using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using MovementCompanyEnhanced.Patches;
 
 namespace MovementCompanyEnhanced.Core {
     [BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]
     public class Plugin : BaseUnityPlugin {
         internal static new ManualLogSource Logger { get; private set; }
-        public static new PluginConfig Config { get; private set; }
+        public static new Config Config { get; private set; }
 
         private Harmony patcher;
 
@@ -38,7 +37,7 @@ namespace MovementCompanyEnhanced.Core {
 
         private void InitPatcher() {
             patcher = new(Metadata.GUID);
-            patcher.PatchAll(typeof(PlayerControllerPatch));
+            patcher.PatchAll();
 
             LogPatches();
         }
