@@ -55,9 +55,7 @@ namespace MovementCompanyEnhanced.Patches {
         [HarmonyPatch("DamagePlayer")]
         public static bool OverrideFallDamage(ref int damageNumber, ref bool fallDamage) {
             if (Plugin.Config.FALL_DAMAGE_ENABLED) {
-                fallDamage = false;
                 damageNumber = Mathf.Clamp(Mathf.RoundToInt(Plugin.Config.FALL_DAMAGE), 0, 100);
-
                 return true;
             }
 
