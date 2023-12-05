@@ -34,7 +34,7 @@ namespace MovementCompanyEnhanced.Component {
             GUI.Label(new Rect(10, 130, 500, 500), "Airborne (Actual): " + Airborne());
         }
 
-        public void Start() {
+        void Start() {
             cfg = Plugin.Config;
             ApplyConfigSpeeds();
 
@@ -43,7 +43,7 @@ namespace MovementCompanyEnhanced.Component {
             MovePlayer(0, -0.5f, 0);
         }
 
-        public void Update() {
+        void Update() {
             if (player.isInHangarShipRoom && !Plugin.Config.BHOP_IN_SHIP) {
                 return;
             }
@@ -72,13 +72,13 @@ namespace MovementCompanyEnhanced.Component {
             }
         }
 
-        public void ApplyConfigSpeeds() {
+        private void ApplyConfigSpeeds() {
             player.movementSpeed = ValNonNegative(cfg.MOVEMENT_SPEED);
             player.climbSpeed = ValNonNegative(cfg.CLIMB_SPEED);
             player.sinkingSpeedMultiplier = ValNonNegative(cfg.SINK_SPEED_MULTIPLIER);
         }
 
-        public void UpdateJumpTime(bool jumping) {
+        private void UpdateJumpTime(bool jumping) {
             if (jumping && jumpTime < cfg.MAX_JUMP_DURATION) {
                 Plugin.Logger.LogDebug("Updating jump time");
 
@@ -87,7 +87,7 @@ namespace MovementCompanyEnhanced.Component {
             }
         }
 
-        public void LerpToGround() {
+        private void LerpToGround() {
             float timeToGround = Time.deltaTime * cfg.GROUND_VELOCITY_MULTIPLIER;
             wantedVelToAdd = Vector3.Lerp(wantedVelToAdd, Vector3.zero, timeToGround);
 
@@ -95,7 +95,7 @@ namespace MovementCompanyEnhanced.Component {
             jumpTime = 0;
         }
 
-        public void ApplyBhop() {
+        private void ApplyBhop() {
             if (!inAir) {
                 inAir = true;
                 AddJumpVelocity(cfg.AIR_VELOCITY_MULTIPLIER);
@@ -109,7 +109,7 @@ namespace MovementCompanyEnhanced.Component {
             AddRotationVelocity(cfg.ROTATION_THRESHOLD);
         }
 
-        public void AddJumpVelocity(float multiplier) {
+        private void AddJumpVelocity(float multiplier) {
             Vector3 vel = player.thisController.velocity;
             vel.y = 0;
 
@@ -118,7 +118,7 @@ namespace MovementCompanyEnhanced.Component {
             }
         }
 
-        public void AddRotationVelocity(float threshold) {
+        private void AddRotationVelocity(float threshold) {
             Vector3 fwdDiff = CurrentForward() - previousForward;
             bool applyVelocity = fwdDiff.magnitude > threshold;
 
@@ -129,16 +129,16 @@ namespace MovementCompanyEnhanced.Component {
             previousForward = CurrentForward();
         }
 
-        public bool Airborne() {
-            return !player.thisController.isGrounded && !player.isClimbingLadder;
-        }
-
-        public void MovePlayer(Vector3 motion) {
+        private void MovePlayer(Vector3 motion) {
             player.thisController.Move(motion);
         }
 
-        public void MovePlayer(float x, float y, float z) {
+        private void MovePlayer(float x, float y, float z) {
             player.thisController.Move(new Vector3(x, y, z));
+        }
+
+        public bool Airborne() {
+            return !player.thisController.isGrounded && !player.isClimbingLadder;
         }
 
         public Vector3 CurrentForward() {
@@ -153,7 +153,7 @@ namespace MovementCompanyEnhanced.Component {
             return CurrentVelocity() >= cfg.MAX_AIR_VELOCITY;
         }
 
-        public void SetStamina(float val) {
+        private void SetStamina(float val) {
             // Prevents potential weird behaviours.
             player.sprintMeter = ValNonNegative(val);
         }

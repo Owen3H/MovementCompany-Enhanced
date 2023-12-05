@@ -6,11 +6,21 @@ namespace MovementCompanyEnhanced.Core {
         public bool PLUGIN_ENABLED { get; private set; }
         public bool DISPLAY_DEBUG_INFO { get; private set; }
 
+        public float MOVEMENT_SPEED { get; private set; }
+        public float CLIMB_SPEED { get; private set; }
+        public float SINK_SPEED_MULTIPLIER { get; private set; }
+
+        public bool FALL_DAMAGE_ENABLED { get; private set; }
+        public float FALL_DAMAGE { get; private set; }
+        public bool FALL_DAMAGE_WEIGHT_AFFECTED { get; private set; }
+        public float FALL_DAMAGE_WEIGHT_MULTIPLIER { get; private set; }
+
         public bool INFINITE_STAMINA { get; private set; }
         public float MAX_STAMINA { get; private set; }
 
         public bool BHOP_IN_FACTORY { get; private set; }
         public bool BHOP_IN_SHIP { get; private set; }
+
         public float MAX_JUMP_DURATION { get; private set; }
         public float ROTATION_THRESHOLD { get; private set; }
         public float JUMP_TIME_MULTIPLIER { get; private set; }
@@ -18,17 +28,15 @@ namespace MovementCompanyEnhanced.Core {
         public float FORWARD_VELOCITY_DAMPER { get; private set; } 
         public float AIR_VELOCITY_MULTIPLIER { get; private set; }
         public float GROUND_VELOCITY_MULTIPLIER { get; private set; }
-        public float SINK_SPEED_MULTIPLIER { get; private set; }
-        public float MOVEMENT_SPEED { get; private set; }
-        public float CLIMB_SPEED { get; private set; }
 
         readonly ConfigFile configFile;
 
         public readonly struct Category {
             public static Category GENERAL => new("0 >> General << 0");
-            public static Category STAMINA => new("1 >> Stamina << 1");
-            public static Category BHOP => new("2 >> Bhopping << 2");
-            public static Category MISC => new("3 >> Miscellaneous << 3");
+            public static Category MOVEMENT => new("1 >> Movement << 1");
+            public static Category STAMINA => new("2 >> Stamina << 2");
+            public static Category BHOP => new("3 >> Bhopping << 3");
+            public static Category MISC => new("4 >> Miscellaneous << 4");
 
             readonly string Value;
 
@@ -56,26 +64,41 @@ namespace MovementCompanyEnhanced.Core {
         }
 
         public void InitBindings() {
-            #region General Values (Enable plugin, base speeds)
+            #region General Values (Enable plugin, debugging etc)
             DISPLAY_DEBUG_INFO = NewEntry("bDisplayDebugInfo", false, "Whether to display coordinates, velocity and other debug info.");
             #endregion
 
-            #region Base Movement Values
-            MOVEMENT_SPEED = NewEntry("fMovementSpeed", 4.2f,
+            #region Movement Related Values (Speeds, Fall Damage)
+            MOVEMENT_SPEED = NewEntry(Category.MOVEMENT, "fMovementSpeed", 4.2f,
                 "The base speed at which the player moves. This is NOT a multiplier."
             );
 
-            CLIMB_SPEED = NewEntry("fClimbSpeed", 3.9f,
+            CLIMB_SPEED = NewEntry(Category.MOVEMENT, "fClimbSpeed", 3.9f,
                 "The base speed at which the player climbs. This is NOT a multiplier."
             );
 
-            SINK_SPEED_MULTIPLIER = NewEntry("fSinkSpeedMultiplier", 0.16f,
+            SINK_SPEED_MULTIPLIER = NewEntry(Category.MOVEMENT, "fSinkSpeedMultiplier", 0.16f,
                 "Value to multiply the sinking speed by when in quicksand.\n" +
                 "Don't want to sink as fast? Decrease this value."
             );
+
+            FALL_DAMAGE_ENABLED = NewEntry(Category.MOVEMENT, "bFallDamageEnabled", true, "Whether you take fall damage. 4Head");
+
+            FALL_DAMAGE = NewEntry(Category.MOVEMENT, "fFallDamage", 70f,
+                "How much base HP the player loses from every fall. Clamped between 0-100."
+            );
+
+            //FALL_DAMAGE_WEIGHT_AFFECTED = NewEntry(Category.MOVEMENT, "bWeightAffectsFallDamage", true,
+            //    "If bWeightAffectsFallDamage is true, this value determines how much it affects it."
+            //);
+
+            //FALL_DAMAGE_WEIGHT_MULTIPLIER = NewEntry(Category.MOVEMENT, "bWeightAffectsFallDamage", 0.5f, 
+            //    "The value which fFallDamage is multiplied by \n" +
+            //    "For example: 0.8f would take 80% of the weight from the player's HP."
+            //);
             #endregion
 
-            #region Stamina Values
+            #region Stamina Values (Consumption, Infinite, Max)
             //WALK_CONSUMES_STAMINA = NewEntry("bWalkConsumesStamina", false, 
             //    "Whether walking costs the player some of their stamina."
             //);
@@ -99,7 +122,7 @@ namespace MovementCompanyEnhanced.Core {
             );
             #endregion
 
-            #region Bhop Related Values
+            #region Bhop Related Values (Velocity, Jumping, Rotation)
             BHOP_IN_FACTORY = NewEntry(Category.BHOP, "bBhopInFactory", false, "Whether bhopping (not general movement) is allowed inside the factory.");
             BHOP_IN_SHIP = NewEntry(Category.BHOP, "bBhopInFactory", false, "Whether bhopping (not general movement) is allowed inside the ship.");
 

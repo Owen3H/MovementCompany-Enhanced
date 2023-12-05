@@ -35,11 +35,11 @@ namespace MovementCompanyEnhanced.Core {
             LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
         }
 
-        private void InitPatcher() {
+        public void InitPatcher() {
             patcher = new(Metadata.GUID);
             patcher.PatchAll();
 
-            LogPatches();
+            //LogPatches();
         }
 
         public void LogPatches() {
