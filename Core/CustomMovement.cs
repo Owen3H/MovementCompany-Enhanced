@@ -5,19 +5,19 @@ using UnityEngine;
 
 namespace MovementCompanyEnhanced.Component {
     internal class CustomMovement : MonoBehaviour {
-        public PlayerControllerB player;
+        public PlayerControllerB player { get; internal set; }
 
-        private Config cfg;
+        internal Config cfg { get { return Config.Instance; } }
 
-        public static Vector3 wantedVelToAdd;
+        float jumpTime;
 
-        private static readonly Vector3 velToAdd = new(0.0002f, 0.0002f, 0.0002f);
+        bool inAir;
 
-        private Vector3 previousForward;
+        Vector3 wantedVelToAdd;
 
-        public float jumpTime;
+        Vector3 velToAdd;
 
-        private bool inAir;
+        Vector3 previousForward;
 
         void OnGUI() {
             if (!cfg.DISPLAY_DEBUG_INFO) return;
@@ -35,8 +35,11 @@ namespace MovementCompanyEnhanced.Component {
         }
 
         void Start() {
-            cfg = Plugin.Config;
-            ApplyConfigSpeeds();
+            if (Config.IsHost()) {
+                ApplyConfigSpeeds();
+            }
+
+            velToAdd = new(0.0002f, 0.0002f, 0.0002f);
 
             // Player is spawned slightly in the air, ground them so their
             // velocity wont increase and cause them to fly around the ship.
@@ -44,11 +47,11 @@ namespace MovementCompanyEnhanced.Component {
         }
 
         void Update() {
-            if (player.isInHangarShipRoom && !Plugin.Config.BHOP_IN_SHIP) {
+            if (player.isInHangarShipRoom && !cfg.BHOP_IN_SHIP) {
                 return;
             }
 
-            if (player.isInsideFactory && !Plugin.Config.BHOP_IN_FACTORY) {
+            if (player.isInsideFactory && !cfg.BHOP_IN_FACTORY) {
                 return;
             }
 
@@ -72,7 +75,7 @@ namespace MovementCompanyEnhanced.Component {
             }
         }
 
-        private void ApplyConfigSpeeds() {
+        internal void ApplyConfigSpeeds() {
             player.movementSpeed = ValNonNegative(cfg.MOVEMENT_SPEED);
             player.climbSpeed = ValNonNegative(cfg.CLIMB_SPEED);
             player.sinkingSpeedMultiplier = ValNonNegative(cfg.SINK_SPEED_MULTIPLIER);

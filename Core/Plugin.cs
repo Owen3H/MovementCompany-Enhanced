@@ -9,10 +9,11 @@ using HarmonyLib;
 namespace MovementCompanyEnhanced.Core {
     [BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]
     public class Plugin : BaseUnityPlugin {
-        internal static new ManualLogSource Logger { get; private set; }
-        public static new Config Config { get; private set; }
-
         private Harmony patcher;
+
+        internal static new ManualLogSource Logger { get; private set; }
+
+        public static new Config Config { get; internal set; }
 
         private void Awake() {
             Logger = base.Logger;
