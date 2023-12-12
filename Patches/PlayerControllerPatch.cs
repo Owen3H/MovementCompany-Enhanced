@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace MovementCompanyEnhanced.Patches {
@@ -17,15 +16,15 @@ namespace MovementCompanyEnhanced.Patches {
         [HarmonyPostfix]
         [HarmonyPatch("ConnectClientToPlayerObject")]
         public static void InitializeLocalPlayer() {
-            if (NetworkManager.Singleton.IsHost) {
-                Config.MessageManager().RegisterNamedMessageHandler("MCE_OnRequestConfigSync", Config.OnRequestSync);
-                Config.synced = true;
+            if (Config.IsHost) {
+                Config.MessageManager.RegisterNamedMessageHandler("MCE_OnRequestConfigSync", Config.OnRequestSync);
+                Config.Synced = true;
 
                 return;
             }
 
-            Config.synced = false;
-            Config.MessageManager().RegisterNamedMessageHandler("MCE_OnReceiveConfigSync", Config.OnReceiveSync);
+            Config.Synced = false;
+            Config.MessageManager.RegisterNamedMessageHandler("MCE_OnReceiveConfigSync", Config.OnReceiveSync);
             Config.RequestSync();
         }
 

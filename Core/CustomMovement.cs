@@ -7,7 +7,7 @@ namespace MovementCompanyEnhanced.Component {
     internal class CustomMovement : MonoBehaviour {
         public PlayerControllerB player { get; internal set; }
 
-        internal Config cfg { get { return Config.Instance; } }
+        internal Config cfg => Config.Instance;
 
         float jumpTime;
 
@@ -35,7 +35,7 @@ namespace MovementCompanyEnhanced.Component {
         }
 
         void Start() {
-            if (Config.IsHost()) {
+            if (Config.IsHost) {
                 ApplyConfigSpeeds();
             }
 

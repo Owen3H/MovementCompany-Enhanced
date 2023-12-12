@@ -164,12 +164,12 @@ namespace MovementCompanyEnhanced.Core {
         }
 
         public static void RequestSync() {
-            if (!IsClient()) return;
+            if (!IsClient) return;
 
             FastBufferWriter stream = new(4, Allocator.Temp);
 
             try {
-                MessageManager().SendNamedMessage("MCE_OnRequestConfigSync", 0uL, stream);
+                MessageManager.SendNamedMessage("MCE_OnRequestConfigSync", 0uL, stream);
             }
             finally {
                 stream.Dispose();
@@ -177,7 +177,7 @@ namespace MovementCompanyEnhanced.Core {
         }
 
         public static void OnRequestSync(ulong clientId, FastBufferReader _) {
-            if (!IsHost()) return;
+            if (!IsHost) return;
 
             Plugin.Logger.LogInfo($"Config sync request received from client: {clientId}");
 
@@ -187,12 +187,10 @@ namespace MovementCompanyEnhanced.Core {
             FastBufferWriter stream = new(array.Length + 4, Allocator.Temp);
 
             try {
-                //Plugin.Logger.LogInfo("Sending message: MCE_OnReceiveConfigSync");
-
                 stream.WriteValueSafe(in value, default);
                 stream.WriteBytesSafe(array);
 
-                MessageManager().SendNamedMessage("MCE_OnReceiveConfigSync", clientId, stream);
+                MessageManager.SendNamedMessage("MCE_OnReceiveConfigSync", clientId, stream);
             } finally {
                 stream.Dispose();
             }

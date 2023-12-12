@@ -8,43 +8,43 @@ namespace MovementCompanyEnhanced.Data {
     [Serializable]
     public class SyncedInstance<T> {
         public static T Instance { get; internal set; }
-        public static bool synced { get; internal set; }
+        public static bool Synced { get; internal set; }
+
+        internal static CustomMessagingManager MessageManager => NetworkManager.Singleton.CustomMessagingManager;
+
+        internal static bool IsClient => NetworkManager.Singleton.IsClient;
+
+        internal static bool IsHost => NetworkManager.Singleton.IsHost;
 
         internal static byte[] SerializeToBytes(T val) {
             BinaryFormatter bf = new();
-            MemoryStream stream = new();
+            using MemoryStream stream = new();
 
             try {
                 bf.Serialize(stream, val);
-            } catch(Exception e) {
-                Plugin.Logger.LogError($"Error serializing instance: {e}");
+                return stream.ToArray();
             }
-
-            return stream.ToArray();
+            catch (Exception e) {
+                Plugin.Logger.LogError($"Error serializing instance: {e}");
+                return null;
+            }
         }
 
         internal static T DeserializeFromBytes(byte[] data) {
-            MemoryStream serializationStream = new(data);
-            BinaryFormatter binaryFormatter = new();
+            BinaryFormatter bf = new();
+            using MemoryStream stream = new(data);
 
-            return (T) binaryFormatter.Deserialize(serializationStream);
+            try {
+                return (T) bf.Deserialize(stream);
+            } catch (Exception e) {
+                Plugin.Logger.LogError($"Error deserializing instance: {e}");
+                return default;
+            }
         }
 
         internal static void UpdateInstance(byte[] data) {
             Instance = DeserializeFromBytes(data);
-            synced = true;
-        }
-
-        internal static CustomMessagingManager MessageManager() {
-            return NetworkManager.Singleton.CustomMessagingManager;
-        }
-
-        internal static bool IsClient() {
-            return NetworkManager.Singleton.IsClient;
-        }
-
-        internal static bool IsHost() {
-            return NetworkManager.Singleton.IsHost;
+            Synced = true;
         }
     }
 }
