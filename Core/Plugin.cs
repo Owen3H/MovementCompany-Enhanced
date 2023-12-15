@@ -33,7 +33,7 @@ namespace MovementCompanyEnhanced.Core {
 
         public void OnDestroy() {
             if (!PluginEnabled()) return;
-            //LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
+            LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
         }
 
         public void InitPatcher() {

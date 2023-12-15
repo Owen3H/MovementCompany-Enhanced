@@ -23,6 +23,7 @@ namespace MovementCompanyEnhanced.Core {
     [Serializable]
     public class Config : SyncedInstance<Config> {
         public bool PLUGIN_ENABLED { get; private set; }
+        // public bool SYNC_TO_CLIENTS { get; private set; }
         public bool DISPLAY_DEBUG_INFO { get; private set; }
 
         public float MOVEMENT_SPEED { get; private set; }
@@ -31,8 +32,8 @@ namespace MovementCompanyEnhanced.Core {
 
         public bool FALL_DAMAGE_ENABLED { get; private set; }
         public float FALL_DAMAGE { get; private set; }
-        public bool FALL_DAMAGE_WEIGHT_AFFECTED { get; private set; }
-        public float FALL_DAMAGE_WEIGHT_MULTIPLIER { get; private set; }
+        //public bool FALL_DAMAGE_WEIGHT_AFFECTED { get; private set; }
+        //public float FALL_DAMAGE_WEIGHT_MULTIPLIER { get; private set; }
 
         public bool INFINITE_STAMINA { get; private set; }
         public float MAX_STAMINA { get; private set; }
@@ -87,7 +88,7 @@ namespace MovementCompanyEnhanced.Core {
 
             FALL_DAMAGE_ENABLED = NewEntry(ConfigCategory.MOVEMENT, "bFallDamageEnabled", true, "Whether you take fall damage. 4Head");
 
-            FALL_DAMAGE = NewEntry(ConfigCategory.MOVEMENT, "fFallDamage", 70f,
+            FALL_DAMAGE = NewEntry(ConfigCategory.MOVEMENT, "fFallDamage", 16.5f,
                 "How much base HP the player loses from every fall. Clamped between 0-100."
             );
 
@@ -116,7 +117,8 @@ namespace MovementCompanyEnhanced.Core {
 
             INFINITE_STAMINA = NewEntry(ConfigCategory.STAMINA, "bInfiniteStamina", true,
                 "Whether the player has infinite stamina (essential for bhopping).\n" +
-                "THIS WILL BE REPLACED IN A FUTURE UPDATE."
+                "Only applies wherever bhopping is allowed.\n" +
+                "NOTE: THIS WILL BE REPLACED IN FUTURE."
             );
 
             // Native sprint meter is clamped between 0 and 1.
@@ -129,11 +131,11 @@ namespace MovementCompanyEnhanced.Core {
             BHOP_IN_FACTORY = NewEntry(ConfigCategory.BHOP, "bBhopInFactory", false, "Whether bhopping (not general movement) is allowed inside the factory.");
             BHOP_IN_SHIP = NewEntry(ConfigCategory.BHOP, "bBhopInFactory", false, "Whether bhopping (not general movement) is allowed inside the ship.");
 
-            MAX_JUMP_DURATION = NewEntry(ConfigCategory.BHOP, "fMaxJumpDuration", 0.0023f,
+            MAX_JUMP_DURATION = NewEntry(ConfigCategory.BHOP, "fMaxJumpDuration", 0.0025f,
                 "The maximum amount of time a jump can last for."
             );
 
-            ROTATION_THRESHOLD = NewEntry(ConfigCategory.BHOP, "fRotationThreshold", 0.011f,
+            ROTATION_THRESHOLD = NewEntry(ConfigCategory.BHOP, "fRotationThreshold", 0.0115f,
                 "The magnitude at which to begin applying velocity. Higher = more rotation required."
             );
 
@@ -146,17 +148,17 @@ namespace MovementCompanyEnhanced.Core {
                 "The value at which velocity will stop being applied when airborne."
             );
 
-            FORWARD_VELOCITY_DAMPER = NewEntry(ConfigCategory.BHOP, "fForwardVelocityDamper", 1.8f, 
+            FORWARD_VELOCITY_DAMPER = NewEntry(ConfigCategory.BHOP, "fForwardVelocityDamper", 1.7f, 
                 "After jumping, a forward velocity is applied - which is first dampened by this value.\n" +
                 "Note: Increasing this value too much may hinder bhopping."
             );
 
-            AIR_VELOCITY_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fAirVelocityMultiplier", 0.005f,
+            AIR_VELOCITY_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fAirVelocityMultiplier", 0.0045f,
                 "The value to multiply the player's velocity by when airborne.\n" +
                 "Note: Do not let the small value fool you, anything above the default is veryy fast!"
             );
 
-            GROUND_VELOCITY_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fGroundVelocityMultiplier", 2.4f,
+            GROUND_VELOCITY_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fGroundVelocityMultiplier", 2.2f,
                 "The value determining how quickly velocity decreases when not airborne.\n" +
                 "Essentially, this affects how much the player is slowed down when hitting the ground."
             );
@@ -166,14 +168,8 @@ namespace MovementCompanyEnhanced.Core {
         public static void RequestSync() {
             if (!IsClient) return;
 
-            FastBufferWriter stream = new(4, Allocator.Temp);
-
-            try {
-                MessageManager.SendNamedMessage("MCE_OnRequestConfigSync", 0uL, stream);
-            }
-            finally {
-                stream.Dispose();
-            }
+            using FastBufferWriter stream = new(4, Allocator.Temp);
+            MessageManager.SendNamedMessage("MCE_OnRequestConfigSync", 0uL, stream);
         }
 
         public static void OnRequestSync(ulong clientId, FastBufferReader _) {
@@ -184,15 +180,15 @@ namespace MovementCompanyEnhanced.Core {
             byte[] array = SerializeToBytes(Instance);
             int value = array.Length;
 
-            FastBufferWriter stream = new(array.Length + 4, Allocator.Temp);
+            using FastBufferWriter stream = new(array.Length + 4, Allocator.Temp);
 
             try {
                 stream.WriteValueSafe(in value, default);
                 stream.WriteBytesSafe(array);
 
                 MessageManager.SendNamedMessage("MCE_OnReceiveConfigSync", clientId, stream);
-            } finally {
-                stream.Dispose();
+            } catch(Exception e) {
+                Plugin.Logger.LogInfo($"Error occurred syncing config with client: {clientId}\n{e}");
             }
         }
 

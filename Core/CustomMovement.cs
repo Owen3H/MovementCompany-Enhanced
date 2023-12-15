@@ -27,7 +27,6 @@ namespace MovementCompanyEnhanced.Component {
 
             GUI.Label(new Rect(10, 40, 500, 500), "Current Velocity: " + Math.Round(CurrentVelocity(), 3));
             GUI.Label(new Rect(10, 60, 500, 500), "Wanted Velocity: " + Math.Round(wantedVelToAdd.magnitude, 3));
-            //GUI.Label(new Rect(10, 80, 500, 500), "Reached Max Velocity: " + ReachedMaxVelocity());
 
             GUI.Label(new Rect(10, 90, 500, 500), "Jump Time: " + jumpTime);
             GUI.Label(new Rect(10, 110, 500, 500), "Airborne: " + inAir);
@@ -83,8 +82,6 @@ namespace MovementCompanyEnhanced.Component {
 
         private void UpdateJumpTime(bool jumping) {
             if (jumping && jumpTime < cfg.MAX_JUMP_DURATION) {
-                Plugin.Logger.LogDebug("Updating jump time");
-
                 player.fallValue = player.jumpForce;
                 jumpTime += Time.deltaTime * cfg.JUMP_TIME_MULTIPLIER / 100;
             }
