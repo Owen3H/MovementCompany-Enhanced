@@ -26,6 +26,7 @@ namespace MovementCompanyEnhanced.Core {
         // public bool SYNC_TO_CLIENTS { get; private set; }
         public bool DISPLAY_DEBUG_INFO { get; private set; }
 
+        public bool HOLD_TO_CROUCH { get; private set; }
         public float MOVEMENT_SPEED { get; private set; }
         public float CLIMB_SPEED { get; private set; }
         public float SINK_SPEED_MULTIPLIER { get; private set; }
@@ -53,7 +54,7 @@ namespace MovementCompanyEnhanced.Core {
         readonly ConfigFile configFile;
 
         public Config(ConfigFile cfg) {
-            Instance = this;
+            InitInstance(this);
 
             configFile = cfg;
             PLUGIN_ENABLED = NewEntry("bEnabled", true, "Enable or disable the plugin globally.");
@@ -73,6 +74,10 @@ namespace MovementCompanyEnhanced.Core {
             #endregion
 
             #region Movement Related Values (Speeds, Fall Damage)
+            HOLD_TO_CROUCH = NewEntry(ConfigCategory.MOVEMENT, "bHoldToCrouch", true, 
+                "Whether the player should hold to crouch instead of a toggle."
+            );
+
             MOVEMENT_SPEED = NewEntry(ConfigCategory.MOVEMENT, "fMovementSpeed", 4.2f,
                 "The base speed at which the player moves. This is NOT a multiplier."
             );
@@ -96,7 +101,7 @@ namespace MovementCompanyEnhanced.Core {
             //    "If bWeightAffectsFallDamage is true, this value determines how much it affects it."
             //);
 
-            //FALL_DAMAGE_WEIGHT_MULTIPLIER = NewEntry(ConfigCategory.MOVEMENT, "bWeightAffectsFallDamage", 0.5f, 
+            //FALL_DAMAGE_WEIGHT_MULTIPLIER = NewEntry(ConfigCategory.MOVEMENT, "bFallDamageWeightMultiplier", 0.5f, 
             //    "The value which fFallDamage is multiplied by \n" +
             //    "For example: 0.8f would take 80% of the weight from the player's HP."
             //);
@@ -207,7 +212,7 @@ namespace MovementCompanyEnhanced.Core {
             byte[] data = new byte[val];
             reader.ReadBytesSafe(ref data, val);
 
-            UpdateInstance(data);
+            SyncInstance(data);
             PlayerControllerPatch.movementScript.ApplyConfigSpeeds();
 
             Plugin.Logger.LogInfo("Successfully synced config with host.");

@@ -39,6 +39,9 @@
     <Reference Include="Unity.Collections">
       <HintPath>E:\Programs\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Collections.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>E:\Programs\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.InputSystem.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Netcode.Runtime">
       <HintPath>E:\Programs\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
     </Reference>

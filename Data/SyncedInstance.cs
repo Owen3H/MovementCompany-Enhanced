@@ -7,16 +7,31 @@ using Unity.Netcode;
 namespace MovementCompanyEnhanced.Data {
     [Serializable]
     public class SyncedInstance<T> {
-        public static T Instance { get; internal set; }
         public static bool Synced { get; internal set; }
 
+        public static T Default { get; private set; }
+        public static T Instance { get; private set; }
+
         internal static CustomMessagingManager MessageManager => NetworkManager.Singleton.CustomMessagingManager;
-
         internal static bool IsClient => NetworkManager.Singleton.IsClient;
-
         internal static bool IsHost => NetworkManager.Singleton.IsHost;
 
-        internal static byte[] SerializeToBytes(T val) {
+        protected void InitInstance(T instance) {
+            Default = instance;
+            Instance = instance;
+        }
+
+        internal static void SyncInstance(byte[] data) {
+            Instance = DeserializeFromBytes(data);
+            Synced = true;
+        }
+
+        internal static void RevertSync() {
+            Instance = Default;
+            Synced = false;
+        }
+
+        public static byte[] SerializeToBytes(T val) {
             BinaryFormatter bf = new();
             using MemoryStream stream = new();
 
@@ -30,7 +45,7 @@ namespace MovementCompanyEnhanced.Data {
             }
         }
 
-        internal static T DeserializeFromBytes(byte[] data) {
+        public static T DeserializeFromBytes(byte[] data) {
             BinaryFormatter bf = new();
             using MemoryStream stream = new(data);
 
@@ -40,11 +55,6 @@ namespace MovementCompanyEnhanced.Data {
                 Plugin.Logger.LogError($"Error deserializing instance: {e}");
                 return default;
             }
-        }
-
-        internal static void UpdateInstance(byte[] data) {
-            Instance = DeserializeFromBytes(data);
-            Synced = true;
         }
     }
 }

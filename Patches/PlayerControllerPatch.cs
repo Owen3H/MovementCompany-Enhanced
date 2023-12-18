@@ -2,11 +2,13 @@ using GameNetcodeStuff;
 using HarmonyLib;
 using MovementCompanyEnhanced.Component;
 using MovementCompanyEnhanced.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace MovementCompanyEnhanced.Patches {
     [HarmonyPatch(typeof(PlayerControllerB))]
@@ -31,12 +33,10 @@ namespace MovementCompanyEnhanced.Patches {
         [HarmonyPostfix]
         [HarmonyPatch("SpawnPlayerAnimation")]
         public static void GiveMovementScript(PlayerControllerB __instance) {
-            // Shouldn't ever happen here but just in-case.
-            if (__instance == null)
+            if (!__instance) return;
+            if (__instance.GetComponentInChildren<CustomMovement>() != null) {
                 return;
-
-            if (__instance.GetComponentInChildren<CustomMovement>() != null)
-                return;
+            }
 
             if (__instance.IsOwner && __instance.isPlayerControlled) {
                 movementScript = __instance.gameObject.AddComponent<CustomMovement>();
@@ -79,6 +79,34 @@ namespace MovementCompanyEnhanced.Patches {
             }
 
             return !fallDamage;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("Crouch_performed")]
+        public static bool DisableCrouchToggle() {
+            if (Config.Default.HOLD_TO_CROUCH) {
+                movementScript.player.Crouch(true);
+                return false;
+            }
+
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("OnEnable")]
+        public static void CrouchHold() {
+            if (!Config.Default.HOLD_TO_CROUCH) return;
+
+            try {
+                InputActionAsset actions = IngamePlayerSettings.Instance.playerInput.actions;
+                actions.FindAction("Crouch", false).canceled += CrouchCanceled;
+            } catch(Exception e) {
+                Plugin.Logger.LogError($"An error occurred patching crouch hold!\n{e}");
+            }
+        }
+
+        static void CrouchCanceled(InputAction.CallbackContext _) {
+            movementScript.player.Crouch(false);
         }
     }
 }
