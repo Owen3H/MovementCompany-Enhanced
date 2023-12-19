@@ -100,11 +100,11 @@ namespace MovementCompanyEnhanced.Core {
                 "Don't want to sink as fast? Decrease this value."
             );
 
-            REMOVE_FIRST_JUMP_DELAY = NewEntry(ConfigCategory.MOVEMENT, "bRemoveJumpDelay", true,
+            REMOVE_FIRST_JUMP_DELAY = NewEntry(ConfigCategory.MOVEMENT, "bRemoveFirstJumpDelay", true,
                 "Removes the immediate jump delay of 150ms after jumping."
             );
 
-            REMOVE_SECOND_JUMP_DELAY = NewEntry(ConfigCategory.MOVEMENT, "bRemoveJumpDelay", true,
+            REMOVE_SECOND_JUMP_DELAY = NewEntry(ConfigCategory.MOVEMENT, "bRemoveSecondJumpDelay", true,
                 "Removes the jump delay of 100ms before jumping can end."
             );
 

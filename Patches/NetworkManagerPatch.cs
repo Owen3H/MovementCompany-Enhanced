@@ -7,7 +7,7 @@ namespace MovementCompanyEnhanced.Patches {
         [HarmonyPostfix]
         [HarmonyPatch("StartDisconnect")]
         public static void PlayerLeave() {
-            if (!Config.Default.FORCE_HOST_CONFIG)
+            if (!Config.Default.SYNC_TO_CLIENTS)
                 return;
 
             Config.RevertSync();

@@ -33,6 +33,11 @@ namespace MovementCompanyEnhanced.Data {
             Instance = DeserializeFromBytes(data);
             Synced = true;
 
+            if (!Config.Instance.SYNC_TO_CLIENTS) {
+                RevertSync();
+                return;
+            }
+
             Log("Successfully synced config with host.");
         }
 
