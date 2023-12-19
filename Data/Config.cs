@@ -87,7 +87,7 @@ namespace MovementCompanyEnhanced.Core {
                 "NOTE: This setting is client-side and cannot be forced by the host."
             );
 
-            MOVEMENT_SPEED = NewEntry(ConfigCategory.MOVEMENT, "fMovementSpeed", 4.2f,
+            MOVEMENT_SPEED = NewEntry(ConfigCategory.MOVEMENT, "fMovementSpeed", 4.1f,
                 "The base speed at which the player moves. This is NOT a multiplier."
             );
 
@@ -161,26 +161,26 @@ namespace MovementCompanyEnhanced.Core {
                 "The magnitude at which to begin applying velocity. Higher = more rotation required."
             );
 
-            JUMP_TIME_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fJumpTimeMultiplier", 28f,
+            JUMP_TIME_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fJumpTimeMultiplier", 29f,
                 "The value to multiply 'jump time' by, affecting how quickly you hit MaxJumpDuration.\n" +
                 "Lower values will cause the player to feel more weightless."
             );
 
-            MAX_AIR_VELOCITY = NewEntry(ConfigCategory.BHOP, "fMaxAirVelocity", 50f,
+            MAX_AIR_VELOCITY = NewEntry(ConfigCategory.BHOP, "fMaxAirVelocity", 60f,
                 "The value at which velocity will stop being applied when airborne."
             );
 
-            FORWARD_VELOCITY_DAMPER = NewEntry(ConfigCategory.BHOP, "fForwardVelocityDamper", 1.7f, 
+            FORWARD_VELOCITY_DAMPER = NewEntry(ConfigCategory.BHOP, "fForwardVelocityDamper", 1.65f, 
                 "After jumping, a forward velocity is applied - which is first dampened by this value.\n" +
                 "Note: Increasing this value too much may hinder bhopping."
             );
 
-            AIR_VELOCITY_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fAirVelocityMultiplier", 0.0045f,
+            AIR_VELOCITY_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fAirVelocityMultiplier", 0.0046f,
                 "The value to multiply the player's velocity by when airborne.\n" +
                 "Note: Do not let the small value fool you, anything above the default is veryy fast!"
             );
 
-            GROUND_VELOCITY_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fGroundVelocityMultiplier", 2.2f,
+            GROUND_VELOCITY_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fGroundVelocityMultiplier", 1.9f,
                 "The value determining how quickly velocity decreases when not airborne.\n" +
                 "Essentially, this affects how much the player is slowed down when hitting the ground."
             );
