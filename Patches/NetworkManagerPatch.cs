@@ -7,7 +7,9 @@ namespace MovementCompanyEnhanced.Patches {
         [HarmonyPostfix]
         [HarmonyPatch("StartDisconnect")]
         public static void PlayerLeave() {
-            Plugin.Logger.LogInfo($"Config sync disabled. Reverted to client config.");
+            if (!Config.Default.FORCE_HOST_CONFIG)
+                return;
+
             Config.RevertSync();
         }
     }

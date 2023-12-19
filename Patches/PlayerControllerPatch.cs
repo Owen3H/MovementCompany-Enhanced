@@ -15,6 +15,9 @@ namespace MovementCompanyEnhanced.Patches {
     internal class PlayerControllerPatch {
         internal static CustomMovement movementScript;
 
+        static bool removeFirstDelay => Config.Instance.REMOVE_FIRST_JUMP_DELAY;
+        static bool removeSecondDelay => Config.Instance.REMOVE_SECOND_JUMP_DELAY;
+
         [HarmonyPostfix]
         [HarmonyPatch("ConnectClientToPlayerObject")]
         public static void InitializeLocalPlayer() {
@@ -51,6 +54,12 @@ namespace MovementCompanyEnhanced.Patches {
         public static IEnumerable<CodeInstruction> RemoveJumpDelay(IEnumerable<CodeInstruction> instructions) {
             List<CodeInstruction> patchedInstructions = instructions.ToList();
 
+            if (!removeFirstDelay && !removeSecondDelay) {
+                return patchedInstructions;
+            }
+
+            int wfsCount = 0;
+
             for (int i = 0; i < patchedInstructions.Count; i++) {
                 CodeInstruction curInstruction = patchedInstructions[i];
                 if (curInstruction.opcode != OpCodes.Newobj) 
@@ -59,10 +68,18 @@ namespace MovementCompanyEnhanced.Patches {
                 #region Replace `new WaitForSeconds(float32)` with `null`
                 var op = curInstruction.operand as ConstructorInfo;
                 if (op?.DeclaringType == typeof(WaitForSeconds)) {
+                    if (wfsCount == 0 && !removeFirstDelay)
+                        continue;
+
+                    if (wfsCount == 1 && !removeSecondDelay)
+                        continue;
+
                     // Equivalent to `yield return null`
                     patchedInstructions[i] = new CodeInstruction(OpCodes.Ldnull);
                     patchedInstructions.RemoveAt(i-1);
                     i--;
+
+                    wfsCount++;
                 }
                 #endregion
             }

@@ -23,10 +23,13 @@ namespace MovementCompanyEnhanced.Core {
     [Serializable]
     public class Config : SyncedInstance<Config> {
         public bool PLUGIN_ENABLED { get; private set; }
-        // public bool SYNC_TO_CLIENTS { get; private set; }
         public bool DISPLAY_DEBUG_INFO { get; private set; }
+        public bool SYNC_TO_CLIENTS { get; private set; }
 
         public bool HOLD_TO_CROUCH { get; private set; }
+        public bool REMOVE_FIRST_JUMP_DELAY {  get; private set; }
+        public bool REMOVE_SECOND_JUMP_DELAY { get; private set; }
+
         public float MOVEMENT_SPEED { get; private set; }
         public float CLIMB_SPEED { get; private set; }
         public float SINK_SPEED_MULTIPLIER { get; private set; }
@@ -71,11 +74,17 @@ namespace MovementCompanyEnhanced.Core {
         public void InitBindings() {
             #region General Values (Enable plugin, debugging etc)
             DISPLAY_DEBUG_INFO = NewEntry("bDisplayDebugInfo", false, "Whether to display coordinates, velocity and other debug info.");
+
+            SYNC_TO_CLIENTS = NewEntry("bSyncToClients", true,
+                "As the host, should clients be forced to use our config values?\n" +
+                "Setting this to `false` will allow clients to use their own config."
+            );
             #endregion
 
             #region Movement Related Values (Speeds, Fall Damage)
             HOLD_TO_CROUCH = NewEntry(ConfigCategory.MOVEMENT, "bHoldToCrouch", true, 
-                "Whether the player should hold to crouch instead of a toggle."
+                "Whether the player should hold to crouch instead of a toggle.\n" +
+                "NOTE: This setting is client-side and cannot be forced by the host."
             );
 
             MOVEMENT_SPEED = NewEntry(ConfigCategory.MOVEMENT, "fMovementSpeed", 4.2f,
@@ -89,6 +98,14 @@ namespace MovementCompanyEnhanced.Core {
             SINK_SPEED_MULTIPLIER = NewEntry(ConfigCategory.MOVEMENT, "fSinkSpeedMultiplier", 0.16f,
                 "Value to multiply the sinking speed by when in quicksand.\n" +
                 "Don't want to sink as fast? Decrease this value."
+            );
+
+            REMOVE_FIRST_JUMP_DELAY = NewEntry(ConfigCategory.MOVEMENT, "bRemoveJumpDelay", true,
+                "Removes the immediate jump delay of 150ms after jumping."
+            );
+
+            REMOVE_SECOND_JUMP_DELAY = NewEntry(ConfigCategory.MOVEMENT, "bRemoveJumpDelay", true,
+                "Removes the jump delay of 100ms before jumping can end."
             );
 
             FALL_DAMAGE_ENABLED = NewEntry(ConfigCategory.MOVEMENT, "bFallDamageEnabled", true, "Whether you take fall damage. 4Head");
@@ -173,19 +190,21 @@ namespace MovementCompanyEnhanced.Core {
         public static void RequestSync() {
             if (!IsClient) return;
 
-            using FastBufferWriter stream = new(4, Allocator.Temp);
+            using FastBufferWriter stream = new(IntSize, Allocator.Temp);
+
+            // Method `OnRequestSync` will then get called on host.
             MessageManager.SendNamedMessage("MCE_OnRequestConfigSync", 0uL, stream);
         }
 
         public static void OnRequestSync(ulong clientId, FastBufferReader _) {
             if (!IsHost) return;
 
-            Plugin.Logger.LogInfo($"Config sync request received from client: {clientId}");
+            Log($"Config sync request received from client: {clientId}");
 
             byte[] array = SerializeToBytes(Instance);
             int value = array.Length;
 
-            using FastBufferWriter stream = new(array.Length + 4, Allocator.Temp);
+            using FastBufferWriter stream = new(value + IntSize, Allocator.Temp);
 
             try {
                 stream.WriteValueSafe(in value, default);
@@ -193,19 +212,19 @@ namespace MovementCompanyEnhanced.Core {
 
                 MessageManager.SendNamedMessage("MCE_OnReceiveConfigSync", clientId, stream);
             } catch(Exception e) {
-                Plugin.Logger.LogInfo($"Error occurred syncing config with client: {clientId}\n{e}");
+                Log($"Error occurred syncing config with client: {clientId}\n{e}");
             }
         }
 
         public static void OnReceiveSync(ulong _, FastBufferReader reader) {
-            if (!reader.TryBeginRead(4)) {
-                Plugin.Logger.LogError("Config sync error: Could not begin reading buffer.");
+            if (!reader.TryBeginRead(IntSize)) {
+                LogErr("Config sync error: Could not begin reading buffer.");
                 return;
             }
 
             reader.ReadValueSafe(out int val, default);
             if (!reader.TryBeginRead(val)) {
-                Plugin.Logger.LogError("Config sync error: Host could not sync.");
+                LogErr("Config sync error: Host could not sync.");
                 return;
             }
 
@@ -214,8 +233,6 @@ namespace MovementCompanyEnhanced.Core {
 
             SyncInstance(data);
             PlayerControllerPatch.movementScript.ApplyConfigSpeeds();
-
-            Plugin.Logger.LogInfo("Successfully synced config with host.");
         }
     }
 }

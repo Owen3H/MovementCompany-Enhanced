@@ -7,28 +7,40 @@ using Unity.Netcode;
 namespace MovementCompanyEnhanced.Data {
     [Serializable]
     public class SyncedInstance<T> {
-        public static bool Synced { get; internal set; }
-
-        public static T Default { get; private set; }
-        public static T Instance { get; private set; }
-
         internal static CustomMessagingManager MessageManager => NetworkManager.Singleton.CustomMessagingManager;
         internal static bool IsClient => NetworkManager.Singleton.IsClient;
         internal static bool IsHost => NetworkManager.Singleton.IsHost;
 
+        internal static void Log (string str) => Plugin.Logger.LogInfo(str);
+        internal static void LogErr (string str) => Plugin.Logger.LogError(str);
+
+        [NonSerialized]
+        protected static int IntSize = 4;
+
+        public static T Default { get; private set; }
+        public static T Instance { get; private set; }
+
+        public static bool Synced { get; internal set; }
+
         protected void InitInstance(T instance) {
             Default = instance;
             Instance = instance;
+
+            IntSize = sizeof(int);
         }
 
         internal static void SyncInstance(byte[] data) {
             Instance = DeserializeFromBytes(data);
             Synced = true;
+
+            Log("Successfully synced config with host.");
         }
 
         internal static void RevertSync() {
             Instance = Default;
             Synced = false;
+
+            Log($"Config sync disabled. Reverted to client config.");
         }
 
         public static byte[] SerializeToBytes(T val) {
@@ -40,7 +52,7 @@ namespace MovementCompanyEnhanced.Data {
                 return stream.ToArray();
             }
             catch (Exception e) {
-                Plugin.Logger.LogError($"Error serializing instance: {e}");
+                LogErr($"Error serializing instance: {e}");
                 return null;
             }
         }
@@ -52,7 +64,7 @@ namespace MovementCompanyEnhanced.Data {
             try {
                 return (T) bf.Deserialize(stream);
             } catch (Exception e) {
-                Plugin.Logger.LogError($"Error deserializing instance: {e}");
+                LogErr($"Error deserializing instance: {e}");
                 return default;
             }
         }

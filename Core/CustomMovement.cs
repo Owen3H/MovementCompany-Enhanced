@@ -20,7 +20,7 @@ namespace MovementCompanyEnhanced.Component {
         Vector3 previousForward;
 
         void OnGUI() {
-            if (!cfg.DISPLAY_DEBUG_INFO) return;
+            if (!Config.Default.DISPLAY_DEBUG_INFO) return;
 
             Vector3 pos = player.thisController.transform.position;
             GUI.Label(new Rect(10, 10, 500, 500), Vec3ToString(pos));
