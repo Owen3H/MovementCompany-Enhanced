@@ -1,9 +1,12 @@
+using System;
 using BepInEx.Configuration;
+
+using MovementCompanyEnhanced.Data;
+using MovementCompanyEnhanced.Patches;
+
 using Unity.Netcode;
 using Unity.Collections;
-using MovementCompanyEnhanced.Data;
-using System;
-using MovementCompanyEnhanced.Patches;
+using System.Runtime.Serialization;
 
 namespace MovementCompanyEnhanced.Core {
     public struct ConfigCategory {
@@ -20,38 +23,38 @@ namespace MovementCompanyEnhanced.Core {
         }
     }
 
-    [Serializable]
+    [DataContract]
     public class Config : SyncedInstance<Config> {
-        public bool PLUGIN_ENABLED { get; private set; }
-        public bool DISPLAY_DEBUG_INFO { get; private set; }
-        public bool SYNC_TO_CLIENTS { get; private set; }
+        [DataMember] public bool PLUGIN_ENABLED { get; private set; }
+        [DataMember] public bool DISPLAY_DEBUG_INFO { get; private set; }
+        [DataMember] public bool SYNC_TO_CLIENTS { get; private set; }
 
-        public bool HOLD_TO_CROUCH { get; private set; }
-        public bool REMOVE_FIRST_JUMP_DELAY {  get; private set; }
-        public bool REMOVE_SECOND_JUMP_DELAY { get; private set; }
+        [DataMember] public bool HOLD_TO_CROUCH { get; private set; }
+        [DataMember] public bool REMOVE_FIRST_JUMP_DELAY {  get; private set; }
+        [DataMember] public bool REMOVE_SECOND_JUMP_DELAY { get; private set; }
 
-        public float MOVEMENT_SPEED { get; private set; }
-        public float CLIMB_SPEED { get; private set; }
-        public float SINK_SPEED_MULTIPLIER { get; private set; }
+        [DataMember] public float MOVEMENT_SPEED { get; private set; }
+        [DataMember] public float CLIMB_SPEED { get; private set; }
+        [DataMember] public float SINK_SPEED_MULTIPLIER { get; private set; }
 
-        public bool FALL_DAMAGE_ENABLED { get; private set; }
-        public float FALL_DAMAGE { get; private set; }
+        [DataMember] public bool FALL_DAMAGE_ENABLED { get; private set; }
+        [DataMember] public float FALL_DAMAGE { get; private set; }
         //public bool FALL_DAMAGE_WEIGHT_AFFECTED { get; private set; }
         //public float FALL_DAMAGE_WEIGHT_MULTIPLIER { get; private set; }
 
-        public bool INFINITE_STAMINA { get; private set; }
-        public float MAX_STAMINA { get; private set; }
+        [DataMember] public bool INFINITE_STAMINA { get; private set; }
+        [DataMember] public float MAX_STAMINA { get; private set; }
 
-        public bool BHOP_IN_FACTORY { get; private set; }
-        public bool BHOP_IN_SHIP { get; private set; }
+        [DataMember] public bool BHOP_IN_FACTORY { get; private set; }
+        [DataMember] public bool BHOP_IN_SHIP { get; private set; }
 
-        public float MAX_JUMP_DURATION { get; private set; }
-        public float ROTATION_THRESHOLD { get; private set; }
-        public float JUMP_TIME_MULTIPLIER { get; private set; }
-        public float MAX_AIR_VELOCITY { get; private set; }
-        public float FORWARD_VELOCITY_DAMPER { get; private set; } 
-        public float AIR_VELOCITY_MULTIPLIER { get; private set; }
-        public float GROUND_VELOCITY_MULTIPLIER { get; private set; }
+        [DataMember] public float MAX_JUMP_DURATION { get; private set; }
+        [DataMember] public float ROTATION_THRESHOLD { get; private set; }
+        [DataMember] public float JUMP_TIME_MULTIPLIER { get; private set; }
+        [DataMember] public float MAX_AIR_VELOCITY { get; private set; }
+        [DataMember] public float FORWARD_VELOCITY_DAMPER { get; private set; } 
+        [DataMember] public float AIR_VELOCITY_MULTIPLIER { get; private set; }
+        [DataMember] public float GROUND_VELOCITY_MULTIPLIER { get; private set; }
 
         [NonSerialized]
         readonly ConfigFile configFile;
@@ -190,34 +193,34 @@ namespace MovementCompanyEnhanced.Core {
         public static void RequestSync() {
             if (!IsClient) return;
 
-            using FastBufferWriter stream = new(IntSize, Allocator.Temp);
+            using FastBufferWriter stream = new(INT_SIZE, Allocator.Temp);
 
             // Method `OnRequestSync` will then get called on host.
-            MessageManager.SendNamedMessage("MCE_OnRequestConfigSync", 0uL, stream);
+            SendMessage("MCE_OnRequestConfigSync", 0uL, stream);
         }
 
         public static void OnRequestSync(ulong clientId, FastBufferReader _) {
             if (!IsHost) return;
 
-            Log($"Config sync request received from client: {clientId}");
+            LogDebug($"Config sync request received from client: {clientId}");
 
             byte[] array = SerializeToBytes(Instance);
             int value = array.Length;
 
-            using FastBufferWriter stream = new(value + IntSize, Allocator.Temp);
+            using FastBufferWriter stream = new(value + INT_SIZE, Allocator.Temp);
 
             try {
                 stream.WriteValueSafe(in value, default);
                 stream.WriteBytesSafe(array);
 
-                MessageManager.SendNamedMessage("MCE_OnReceiveConfigSync", clientId, stream);
+                SendMessage("MCE_OnReceiveConfigSync", clientId, stream);
             } catch(Exception e) {
-                Log($"Error occurred syncing config with client: {clientId}\n{e}");
+                LogErr($"Error occurred syncing config with client: {clientId}\n{e}");
             }
         }
 
         public static void OnReceiveSync(ulong _, FastBufferReader reader) {
-            if (!reader.TryBeginRead(IntSize)) {
+            if (!reader.TryBeginRead(INT_SIZE)) {
                 LogErr("Config sync error: Could not begin reading buffer.");
                 return;
             }

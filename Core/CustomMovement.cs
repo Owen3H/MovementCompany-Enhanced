@@ -75,6 +75,8 @@ namespace MovementCompanyEnhanced.Component {
         }
 
         internal void ApplyConfigSpeeds() {
+            Plugin.Logger.LogDebug("Move speed set to: " + cfg.MOVEMENT_SPEED);
+
             player.movementSpeed = ValNonNegative(cfg.MOVEMENT_SPEED);
             player.climbSpeed = ValNonNegative(cfg.CLIMB_SPEED);
             player.sinkingSpeedMultiplier = ValNonNegative(cfg.SINK_SPEED_MULTIPLIER);

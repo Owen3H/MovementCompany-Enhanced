@@ -1,22 +1,30 @@
 using GameNetcodeStuff;
 using HarmonyLib;
+
 using MovementCompanyEnhanced.Component;
 using MovementCompanyEnhanced.Core;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 namespace MovementCompanyEnhanced.Patches {
     [HarmonyPatch(typeof(PlayerControllerB))]
     internal class PlayerControllerPatch {
         internal static CustomMovement movementScript;
 
+        static bool crouchHeld = false;
+
         static bool removeFirstDelay => Config.Instance.REMOVE_FIRST_JUMP_DELAY;
         static bool removeSecondDelay => Config.Instance.REMOVE_SECOND_JUMP_DELAY;
+
+        static InputActionAsset Actions => IngamePlayerSettings.Instance.playerInput.actions;
 
         [HarmonyPostfix]
         [HarmonyPatch("ConnectClientToPlayerObject")]
@@ -90,7 +98,7 @@ namespace MovementCompanyEnhanced.Patches {
         [HarmonyPrefix]
         [HarmonyPatch("DamagePlayer")]
         public static bool OverrideFallDamage(ref int damageNumber, ref bool fallDamage) {
-            if (Config.Instance.FALL_DAMAGE_ENABLED) {
+            if (Config.Default.FALL_DAMAGE_ENABLED) {
                 damageNumber = Mathf.Clamp(Mathf.RoundToInt(Config.Instance.FALL_DAMAGE), 0, 100);
                 return true;
             }
@@ -98,11 +106,19 @@ namespace MovementCompanyEnhanced.Patches {
             return !fallDamage;
         }
 
+        //[HarmonyPrefix]
+        //[HarmonyPatch("Update")]
+        //public static void FixSprintToCrouch(PlayerControllerB __instance, ref bool ___isWalking) {
+
+        //}
+
         [HarmonyPrefix]
         [HarmonyPatch("Crouch_performed")]
-        public static bool DisableCrouchToggle() {
+        public static bool OnCrouch() {
+            // Disable crouch toggle
             if (Config.Default.HOLD_TO_CROUCH) {
                 movementScript.player.Crouch(true);
+
                 return false;
             }
 
@@ -114,16 +130,22 @@ namespace MovementCompanyEnhanced.Patches {
         public static void CrouchHold() {
             if (!Config.Default.HOLD_TO_CROUCH) return;
 
-            try {
-                InputActionAsset actions = IngamePlayerSettings.Instance.playerInput.actions;
-                actions.FindAction("Crouch", false).canceled += CrouchCanceled;
-            } catch(Exception e) {
-                Plugin.Logger.LogError($"An error occurred patching crouch hold!\n{e}");
-            }
+            InputAction crouchAction = Actions.FindAction("Crouch", true);
+            RegisterActionCancel(crouchAction, CrouchCanceled);
         }
 
-        static void CrouchCanceled(InputAction.CallbackContext _) {
+        public static void RegisterActionCancel(InputAction action, Action<CallbackContext> callback, bool unregister = false) {
+            if (unregister) {
+                action.canceled -= callback;
+                return;
+            }
+
+            action.canceled += callback;
+        }
+
+        static void CrouchCanceled(CallbackContext _) {
             movementScript.player.Crouch(false);
+            crouchHeld = false;
         }
     }
 }

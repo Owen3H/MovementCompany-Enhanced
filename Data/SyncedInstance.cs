@@ -1,77 +1,94 @@
 using MovementCompanyEnhanced.Core;
 using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 using Unity.Netcode;
 
-namespace MovementCompanyEnhanced.Data {
-    [Serializable]
-    public class SyncedInstance<T> {
-        internal static CustomMessagingManager MessageManager => NetworkManager.Singleton.CustomMessagingManager;
-        internal static bool IsClient => NetworkManager.Singleton.IsClient;
-        internal static bool IsHost => NetworkManager.Singleton.IsHost;
+namespace MovementCompanyEnhanced.Data;
 
-        internal static void Log (string str) => Plugin.Logger.LogInfo(str);
-        internal static void LogErr (string str) => Plugin.Logger.LogError(str);
+[Serializable]
+public class SyncedInstance<T> {
+    public static CustomMessagingManager MessageManager => NetworkManager.Singleton.CustomMessagingManager;
+    public static bool IsClient => NetworkManager.Singleton.IsClient;
+    public static bool IsHost => NetworkManager.Singleton.IsHost;
 
-        [NonSerialized]
-        protected static int IntSize = 4;
+    internal static void Log (string str) => Plugin.Logger.LogInfo(str);
+    internal static void LogDebug (string str) => Plugin.Logger.LogDebug(str);
+    internal static void LogErr (string str) => Plugin.Logger.LogError(str);
 
-        public static T Default { get; private set; }
-        public static T Instance { get; private set; }
+    [NonSerialized] 
+    protected static int INT_SIZE = 4;
 
-        public static bool Synced { get; internal set; }
+    [NonSerialized] 
+    static readonly DataContractSerializer serializer = new(typeof(T));
 
-        protected void InitInstance(T instance) {
-            Default = instance;
-            Instance = instance;
+    internal static T Default { get; private set; }
+    internal static T Instance { get; private set; }
 
-            IntSize = sizeof(int);
+    internal static bool Synced;
+
+    protected void InitInstance(T instance) {
+        Default = instance;
+        Instance = instance;
+
+        INT_SIZE = sizeof(int);
+    }
+
+    internal static void SyncInstance(byte[] data) {
+        Instance = DeserializeFromBytes(data);
+        Synced = true;
+
+        if (!Config.Instance.SYNC_TO_CLIENTS) {
+            RevertSync(log: false);
+            return;
         }
 
-        internal static void SyncInstance(byte[] data) {
-            Instance = DeserializeFromBytes(data);
-            Synced = true;
+        Log("Successfully synced config with host.");
+    }
 
-            if (!Config.Instance.SYNC_TO_CLIENTS) {
-                RevertSync();
-                return;
-            }
+    internal static void RevertSync(bool log = true) {
+        Instance = Default;
+        Synced = false;
 
-            Log("Successfully synced config with host.");
+        if (!log) return;
+        Log($"Config sync disabled. Reverted to client config.");
+    }
+
+    public static byte[] SerializeToBytes(T val) {
+        using MemoryStream stream = new();
+
+        try {
+            serializer.WriteObject(stream, val);
+            return stream.ToArray();
+        }
+        catch (Exception e) {
+            LogErr($"Error serializing instance: {e}");
+            return null;
+        }
+    }
+
+    public static T DeserializeFromBytes(byte[] data) {
+        using MemoryStream stream = new(data);
+
+        try {
+            return (T) serializer.ReadObject(stream);
+        } catch (Exception e) {
+            LogErr($"Error deserializing instance: {e}");
+            return default;
+        }
+    }
+
+    internal static void SendMessage(string label, ulong clientId, FastBufferWriter stream) {
+        bool fragment = stream.Capacity > stream.MaxCapacity;
+        NetworkDelivery delivery = fragment ? NetworkDelivery.ReliableFragmentedSequenced : NetworkDelivery.Reliable;
+
+        if (fragment) {
+            LogDebug(
+                $"Size of stream ({stream.Capacity}) was past the max buffer size.\n" +
+                "Config instance will be sent in fragments to avoid overflowing the buffer."
+            );
         }
 
-        internal static void RevertSync() {
-            Instance = Default;
-            Synced = false;
-
-            Log($"Config sync disabled. Reverted to client config.");
-        }
-
-        public static byte[] SerializeToBytes(T val) {
-            BinaryFormatter bf = new();
-            using MemoryStream stream = new();
-
-            try {
-                bf.Serialize(stream, val);
-                return stream.ToArray();
-            }
-            catch (Exception e) {
-                LogErr($"Error serializing instance: {e}");
-                return null;
-            }
-        }
-
-        public static T DeserializeFromBytes(byte[] data) {
-            BinaryFormatter bf = new();
-            using MemoryStream stream = new(data);
-
-            try {
-                return (T) bf.Deserialize(stream);
-            } catch (Exception e) {
-                LogErr($"Error deserializing instance: {e}");
-                return default;
-            }
-        }
+        MessageManager.SendNamedMessage(label, clientId, stream, delivery);
     }
 }

@@ -13,7 +13,7 @@ namespace MovementCompanyEnhanced.Core {
 
         internal static new ManualLogSource Logger { get; private set; }
 
-        public static new Config Config { get; internal set; }
+        public static new Config Config { get; private set; }
 
         private void Awake() {
             Logger = base.Logger;
