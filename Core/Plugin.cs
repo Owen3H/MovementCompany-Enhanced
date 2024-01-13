@@ -3,57 +3,57 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 
-namespace MovementCompanyEnhanced.Core {
-    [BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]
-    public class Plugin : BaseUnityPlugin {
-        private Harmony patcher;
+namespace MovementCompanyEnhanced.Core;
 
-        internal static new ManualLogSource Logger { get; private set; }
+[BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]
+public class Plugin : BaseUnityPlugin {
+    private Harmony patcher;
 
-        public static new Config Config { get; private set; }
+    internal static new ManualLogSource Logger { get; private set; }
 
-        private void Awake() {
-            Logger = base.Logger;
-            Config = new(base.Config);
+    public static new Config Config { get; private set; }
 
-            if (!PluginEnabled(logIfDisabled: true)) return;
+    private void Awake() {
+        Logger = base.Logger;
+        Config = new(base.Config);
 
-            Config.InitBindings();
+        if (!PluginEnabled(logIfDisabled: true)) return;
 
-            try {
-                InitPatcher();
-                Logger.LogInfo("Plugin loaded.");
-            } catch(Exception e) {
-                Logger.LogError(e);
-            }
+        Config.InitBindings();
+
+        try {
+            InitPatcher();
+            Logger.LogInfo("Plugin loaded.");
+        } catch(Exception e) {
+            Logger.LogError(e);
         }
-
-        public void OnDestroy() {
-            if (!PluginEnabled()) return;
-            LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
-        }
-
-        public void InitPatcher() {
-            patcher = new(Metadata.GUID);
-            patcher.PatchAll();
-
-            //LogPatches();
-        }
-
-        public bool PluginEnabled(bool logIfDisabled = false) {
-            bool enabled = Config.PLUGIN_ENABLED;
-            if (!enabled && logIfDisabled) {
-                Logger.LogInfo("MovementCompany disabled globally.");
-            }
-
-            return enabled;
-        }
-
-        //public void LogPatches() {
-        //    IEnumerable<MethodBase> patches = patcher.GetPatchedMethods();
-        //    string str = string.Join(", ", patches.ToList());
-
-        //    Logger.LogInfo("Applied patches to: " + str);
-        //}
     }
+
+    public void OnDestroy() {
+        if (!PluginEnabled()) return;
+        LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
+    }
+
+    public void InitPatcher() {
+        patcher = new(Metadata.GUID);
+        patcher.PatchAll();
+
+        //LogPatches();
+    }
+
+    public bool PluginEnabled(bool logIfDisabled = false) {
+        bool enabled = Config.PLUGIN_ENABLED;
+        if (!enabled && logIfDisabled) {
+            Logger.LogInfo("MovementCompany disabled globally.");
+        }
+
+        return enabled;
+    }
+
+    //public void LogPatches() {
+    //    IEnumerable<MethodBase> patches = patcher.GetPatchedMethods();
+    //    string str = string.Join(", ", patches.ToList());
+
+    //    Logger.LogInfo("Applied patches to: " + str);
+    //}
 }

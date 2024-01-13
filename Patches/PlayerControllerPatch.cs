@@ -14,138 +14,138 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 
-namespace MovementCompanyEnhanced.Patches {
-    [HarmonyPatch(typeof(PlayerControllerB))]
-    internal class PlayerControllerPatch {
-        internal static CustomMovement movementScript;
+namespace MovementCompanyEnhanced.Patches;
 
-        static bool crouchHeld = false;
+[HarmonyPatch(typeof(PlayerControllerB))]
+internal class PlayerControllerPatch {
+    internal static CustomMovement movementScript;
 
-        static bool removeFirstDelay => Config.Instance.REMOVE_FIRST_JUMP_DELAY;
-        static bool removeSecondDelay => Config.Instance.REMOVE_SECOND_JUMP_DELAY;
+    static bool crouchHeld = false;
 
-        static InputActionAsset Actions => IngamePlayerSettings.Instance.playerInput.actions;
+    static bool removeFirstDelay => Config.Instance.REMOVE_FIRST_JUMP_DELAY;
+    static bool removeSecondDelay => Config.Instance.REMOVE_SECOND_JUMP_DELAY;
 
-        [HarmonyPostfix]
-        [HarmonyPatch("ConnectClientToPlayerObject")]
-        public static void InitializeLocalPlayer() {
-            if (Config.IsHost) {
-                Config.MessageManager.RegisterNamedMessageHandler("MCE_OnRequestConfigSync", Config.OnRequestSync);
-                Config.Synced = true;
+    static InputActionAsset Actions => IngamePlayerSettings.Instance.playerInput.actions;
 
-                return;
-            }
+    [HarmonyPostfix]
+    [HarmonyPatch("ConnectClientToPlayerObject")]
+    public static void InitializeLocalPlayer() {
+        if (Config.IsHost) {
+            Config.MessageManager.RegisterNamedMessageHandler("MCE_OnRequestConfigSync", Config.OnRequestSync);
+            Config.Synced = true;
 
-            Config.Synced = false;
-            Config.MessageManager.RegisterNamedMessageHandler("MCE_OnReceiveConfigSync", Config.OnReceiveSync);
-            Config.RequestSync();
+            return;
         }
 
-        [HarmonyPostfix]
-        [HarmonyPatch("SpawnPlayerAnimation")]
-        public static void GiveMovementScript(PlayerControllerB __instance) {
-            if (!__instance) return;
-            if (__instance.GetComponentInChildren<CustomMovement>() != null) {
-                return;
-            }
+        Config.Synced = false;
+        Config.MessageManager.RegisterNamedMessageHandler("MCE_OnReceiveConfigSync", Config.OnReceiveSync);
+        Config.RequestSync();
+    }
 
-            if (__instance.IsOwner && __instance.isPlayerControlled) {
-                movementScript = __instance.gameObject.AddComponent<CustomMovement>();
-                movementScript.player = __instance;
-
-                Plugin.Logger.LogInfo("Client player was given the movement script.");
-            }
+    [HarmonyPostfix]
+    [HarmonyPatch("SpawnPlayerAnimation")]
+    public static void GiveMovementScript(PlayerControllerB __instance) {
+        if (!__instance) return;
+        if (__instance.GetComponentInChildren<CustomMovement>() != null) {
+            return;
         }
 
-        [HarmonyTranspiler]
-        [HarmonyPatch("PlayerJump", MethodType.Enumerator)]
-        public static IEnumerable<CodeInstruction> RemoveJumpDelay(IEnumerable<CodeInstruction> instructions) {
-            List<CodeInstruction> patchedInstructions = instructions.ToList();
+        if (__instance.IsOwner && __instance.isPlayerControlled) {
+            movementScript = __instance.gameObject.AddComponent<CustomMovement>();
+            movementScript.player = __instance;
 
-            if (!removeFirstDelay && !removeSecondDelay) {
-                return patchedInstructions;
-            }
+            Plugin.Logger.LogInfo("Client player was given the movement script.");
+        }
+    }
 
-            int wfsCount = 0;
+    [HarmonyTranspiler]
+    [HarmonyPatch("PlayerJump", MethodType.Enumerator)]
+    public static IEnumerable<CodeInstruction> RemoveJumpDelay(IEnumerable<CodeInstruction> instructions) {
+        List<CodeInstruction> patchedInstructions = instructions.ToList();
 
-            for (int i = 0; i < patchedInstructions.Count; i++) {
-                CodeInstruction curInstruction = patchedInstructions[i];
-                if (curInstruction.opcode != OpCodes.Newobj) 
-                    continue;
-
-                #region Replace `new WaitForSeconds(float32)` with `null`
-                var op = curInstruction.operand as ConstructorInfo;
-                if (op?.DeclaringType == typeof(WaitForSeconds)) {
-                    if (wfsCount == 0 && !removeFirstDelay)
-                        continue;
-
-                    if (wfsCount == 1 && !removeSecondDelay)
-                        continue;
-
-                    // Equivalent to `yield return null`
-                    patchedInstructions[i] = new CodeInstruction(OpCodes.Ldnull);
-                    patchedInstructions.RemoveAt(i-1);
-                    i--;
-
-                    wfsCount++;
-                }
-                #endregion
-            }
-
+        if (!removeFirstDelay && !removeSecondDelay) {
             return patchedInstructions;
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch("DamagePlayer")]
-        public static bool OverrideFallDamage(ref int damageNumber, ref bool fallDamage) {
-            if (Config.Default.FALL_DAMAGE_ENABLED) {
-                damageNumber = Mathf.Clamp(Mathf.RoundToInt(Config.Instance.FALL_DAMAGE), 0, 100);
-                return true;
-            }
+        int wfsCount = 0;
 
-            return !fallDamage;
+        for (int i = 0; i < patchedInstructions.Count; i++) {
+            CodeInstruction curInstruction = patchedInstructions[i];
+            if (curInstruction.opcode != OpCodes.Newobj) 
+                continue;
+
+            #region Replace `new WaitForSeconds(float32)` with `null`
+            var op = curInstruction.operand as ConstructorInfo;
+            if (op?.DeclaringType == typeof(WaitForSeconds)) {
+                if (wfsCount == 0 && !removeFirstDelay)
+                    continue;
+
+                if (wfsCount == 1 && !removeSecondDelay)
+                    continue;
+
+                // Equivalent to `yield return null`
+                patchedInstructions[i] = new CodeInstruction(OpCodes.Ldnull);
+                patchedInstructions.RemoveAt(i-1);
+                i--;
+
+                wfsCount++;
+            }
+            #endregion
         }
 
-        //[HarmonyPrefix]
-        //[HarmonyPatch("Update")]
-        //public static void FixSprintToCrouch(PlayerControllerB __instance, ref bool ___isWalking) {
+        return patchedInstructions;
+    }
 
-        //}
-
-        [HarmonyPrefix]
-        [HarmonyPatch("Crouch_performed")]
-        public static bool OnCrouch() {
-            // Disable crouch toggle
-            if (Config.Default.HOLD_TO_CROUCH) {
-                movementScript.player.Crouch(true);
-
-                return false;
-            }
-
+    [HarmonyPrefix]
+    [HarmonyPatch("DamagePlayer")]
+    public static bool OverrideFallDamage(ref int damageNumber, ref bool fallDamage) {
+        if (Config.Default.FALL_DAMAGE_ENABLED) {
+            damageNumber = Mathf.Clamp(Mathf.RoundToInt(Config.Instance.FALL_DAMAGE), 0, 100);
             return true;
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch("OnEnable")]
-        public static void CrouchHold() {
-            if (!Config.Default.HOLD_TO_CROUCH) return;
+        return !fallDamage;
+    }
 
-            InputAction crouchAction = Actions.FindAction("Crouch", true);
-            RegisterActionCancel(crouchAction, CrouchCanceled);
+    //[HarmonyPrefix]
+    //[HarmonyPatch("Update")]
+    //public static void FixSprintToCrouch(PlayerControllerB __instance, ref bool ___isWalking) {
+
+    //}
+
+    [HarmonyPrefix]
+    [HarmonyPatch("Crouch_performed")]
+    public static bool OnCrouch() {
+        // Disable crouch toggle
+        if (Config.Default.HOLD_TO_CROUCH) {
+            movementScript.player.Crouch(true);
+
+            return false;
         }
 
-        public static void RegisterActionCancel(InputAction action, Action<CallbackContext> callback, bool unregister = false) {
-            if (unregister) {
-                action.canceled -= callback;
-                return;
-            }
+        return true;
+    }
 
-            action.canceled += callback;
+    [HarmonyPrefix]
+    [HarmonyPatch("OnEnable")]
+    public static void CrouchHold() {
+        if (!Config.Default.HOLD_TO_CROUCH) return;
+
+        InputAction crouchAction = Actions.FindAction("Crouch", true);
+        RegisterActionCancel(crouchAction, CrouchCanceled);
+    }
+
+    public static void RegisterActionCancel(InputAction action, Action<CallbackContext> callback, bool unregister = false) {
+        if (unregister) {
+            action.canceled -= callback;
+            return;
         }
 
-        static void CrouchCanceled(CallbackContext _) {
-            movementScript.player.Crouch(false);
-            crouchHeld = false;
-        }
+        action.canceled += callback;
+    }
+
+    static void CrouchCanceled(CallbackContext _) {
+        movementScript.player.Crouch(false);
+        crouchHeld = false;
     }
 }

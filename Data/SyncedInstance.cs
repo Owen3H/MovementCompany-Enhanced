@@ -7,7 +7,7 @@ using Unity.Netcode;
 namespace MovementCompanyEnhanced.Data;
 
 [Serializable]
-public class SyncedInstance<T> {
+public class SyncedInstance<T> where T : class {
     public static CustomMessagingManager MessageManager => NetworkManager.Singleton.CustomMessagingManager;
     public static bool IsClient => NetworkManager.Singleton.IsClient;
     public static bool IsHost => NetworkManager.Singleton.IsHost;
@@ -16,10 +16,10 @@ public class SyncedInstance<T> {
     internal static void LogDebug (string str) => Plugin.Logger.LogDebug(str);
     internal static void LogErr (string str) => Plugin.Logger.LogError(str);
 
-    [NonSerialized] 
+    [NonSerialized]
     protected static int INT_SIZE = 4;
 
-    [NonSerialized] 
+    [NonSerialized]
     static readonly DataContractSerializer serializer = new(typeof(T));
 
     internal static T Default { get; private set; }
