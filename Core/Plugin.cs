@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -43,13 +40,6 @@ namespace MovementCompanyEnhanced.Core {
             //LogPatches();
         }
 
-        public void LogPatches() {
-            IEnumerable<MethodBase> patches = patcher.GetPatchedMethods();
-            string str = string.Join(", ", patches.ToList());
-
-            Logger.LogInfo("Applied patches to: " + str);
-        }
-
         public bool PluginEnabled(bool logIfDisabled = false) {
             bool enabled = Config.PLUGIN_ENABLED;
             if (!enabled && logIfDisabled) {
@@ -58,5 +48,12 @@ namespace MovementCompanyEnhanced.Core {
 
             return enabled;
         }
+
+        //public void LogPatches() {
+        //    IEnumerable<MethodBase> patches = patcher.GetPatchedMethods();
+        //    string str = string.Join(", ", patches.ToList());
+
+        //    Logger.LogInfo("Applied patches to: " + str);
+        //}
     }
 }
