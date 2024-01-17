@@ -6,6 +6,25 @@ using Unity.Netcode;
 
 namespace MovementCompanyEnhanced.Data;
 
+internal static class SyncExtensions {
+    internal static void SendMessage(this FastBufferWriter stream, string label, ulong clientId = 0uL) {
+        bool fragment = stream.Capacity > 1300;
+        NetworkDelivery delivery = fragment 
+            ? NetworkDelivery.ReliableFragmentedSequenced 
+            : NetworkDelivery.Reliable;
+
+        if (fragment) {
+            Plugin.Logger.LogDebug(
+                $"Size of stream ({stream.Capacity}) was past the max buffer size.\n" +
+                "Config instance will be sent in fragments to avoid overflowing the buffer."
+            );
+        }
+
+        var msgManager = NetworkManager.Singleton.CustomMessagingManager;
+        msgManager.SendNamedMessage(label, clientId, stream, delivery);
+    }
+}
+
 [Serializable]
 public class SyncedInstance<T> where T : class {
     public static CustomMessagingManager MessageManager => NetworkManager.Singleton.CustomMessagingManager;
@@ -76,19 +95,5 @@ public class SyncedInstance<T> where T : class {
             LogErr($"Error deserializing instance: {e}");
             return default;
         }
-    }
-
-    internal static void SendMessage(string label, ulong clientId, FastBufferWriter stream) {
-        bool fragment = stream.Capacity > stream.MaxCapacity;
-        NetworkDelivery delivery = fragment ? NetworkDelivery.ReliableFragmentedSequenced : NetworkDelivery.Reliable;
-
-        if (fragment) {
-            LogDebug(
-                $"Size of stream ({stream.Capacity}) was past the max buffer size.\n" +
-                "Config instance will be sent in fragments to avoid overflowing the buffer."
-            );
-        }
-
-        MessageManager.SendNamedMessage(label, clientId, stream, delivery);
     }
 }

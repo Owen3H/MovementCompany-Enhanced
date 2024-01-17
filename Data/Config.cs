@@ -34,7 +34,7 @@ public class Config : SyncedInstance<Config> {
     [DataMember] public bool REMOVE_FIRST_JUMP_DELAY {  get; private set; }
     [DataMember] public bool REMOVE_SECOND_JUMP_DELAY { get; private set; }
 
-    [DataMember] public ConfigEntry<float> MOVEMENT_SPEED { get; private set; }
+    [DataMember] public float MOVEMENT_SPEED { get; private set; }
     [DataMember] public float CLIMB_SPEED { get; private set; }
     [DataMember] public float SINK_SPEED_MULTIPLIER { get; private set; }
 
@@ -197,7 +197,7 @@ public class Config : SyncedInstance<Config> {
         using FastBufferWriter stream = new(INT_SIZE, Allocator.Temp);
 
         // Method `OnRequestSync` will then get called on host.
-        SendMessage("MCE_OnRequestConfigSync", 0uL, stream);
+        stream.SendMessage("MCE_OnRequestConfigSync");
     }
 
     internal static void OnRequestSync(ulong clientId, FastBufferReader _) {
@@ -214,7 +214,7 @@ public class Config : SyncedInstance<Config> {
             stream.WriteValueSafe(in value, default);
             stream.WriteBytesSafe(array);
 
-            SendMessage("MCE_OnReceiveConfigSync", clientId, stream);
+            stream.SendMessage("MCE_OnReceiveConfigSync", clientId);
         } catch(Exception e) {
             LogErr($"Error occurred syncing config with client: {clientId}\n{e}");
         }
