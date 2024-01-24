@@ -1,12 +1,13 @@
 using System;
 using BepInEx.Configuration;
 
-using MovementCompanyEnhanced.Data;
 using MovementCompanyEnhanced.Patches;
 
 using Unity.Netcode;
 using Unity.Collections;
 using System.Runtime.Serialization;
+using CSync.Lib;
+using CSync.Util;
 
 namespace MovementCompanyEnhanced.Core;
 
@@ -26,36 +27,38 @@ public struct ConfigCategory {
 
 [DataContract]
 public class Config : SyncedInstance<Config> {
-    [DataMember] public bool PLUGIN_ENABLED { get; private set; }
-    [DataMember] public bool DISPLAY_DEBUG_INFO { get; private set; }
-    [DataMember] public bool SYNC_TO_CLIENTS { get; private set; }
+    #region Vars
+    public bool PLUGIN_ENABLED { get; private set; }
+    public bool DISPLAY_DEBUG_INFO { get; private set; }
+    [DataMember] public SyncedEntry<bool> SYNC_TO_CLIENTS { get; private set; }
 
-    [DataMember] public bool HOLD_TO_CROUCH { get; private set; }
-    [DataMember] public bool REMOVE_FIRST_JUMP_DELAY {  get; private set; }
-    [DataMember] public bool REMOVE_SECOND_JUMP_DELAY { get; private set; }
+    [DataMember] public SyncedEntry<bool> HOLD_TO_CROUCH { get; private set; }
+    [DataMember] public SyncedEntry<bool> REMOVE_FIRST_JUMP_DELAY {  get; private set; }
+    [DataMember] public SyncedEntry<bool> REMOVE_SECOND_JUMP_DELAY { get; private set; }
 
-    [DataMember] public float MOVEMENT_SPEED { get; private set; }
-    [DataMember] public float CLIMB_SPEED { get; private set; }
-    [DataMember] public float SINK_SPEED_MULTIPLIER { get; private set; }
+    [DataMember] public SyncedEntry<float> MOVEMENT_SPEED { get; private set; }
+    [DataMember] public SyncedEntry<float> CLIMB_SPEED { get; private set; }
+    [DataMember] public SyncedEntry<float> SINK_SPEED_MULTIPLIER { get; private set; }
 
-    [DataMember] public bool FALL_DAMAGE_ENABLED { get; private set; }
-    [DataMember] public float FALL_DAMAGE { get; private set; }
+    [DataMember] public SyncedEntry<bool> FALL_DAMAGE_ENABLED { get; private set; }
+    [DataMember] public SyncedEntry<float> FALL_DAMAGE { get; private set; }
     //public bool FALL_DAMAGE_WEIGHT_AFFECTED { get; private set; }
     //public float FALL_DAMAGE_WEIGHT_MULTIPLIER { get; private set; }
 
-    [DataMember] public bool INFINITE_STAMINA { get; private set; }
-    [DataMember] public float MAX_STAMINA { get; private set; }
+    [DataMember] public SyncedEntry<bool> INFINITE_STAMINA { get; private set; }
+    [DataMember] public SyncedEntry<float> MAX_STAMINA { get; private set; }
 
-    [DataMember] public bool BHOP_IN_FACTORY { get; private set; }
-    [DataMember] public bool BHOP_IN_SHIP { get; private set; }
+    [DataMember] public SyncedEntry<bool> BHOP_IN_FACTORY { get; private set; }
+    [DataMember] public SyncedEntry<bool> BHOP_IN_SHIP { get; private set; }
 
-    [DataMember] public float MAX_JUMP_DURATION { get; private set; }
-    [DataMember] public float ROTATION_THRESHOLD { get; private set; }
-    [DataMember] public float JUMP_TIME_MULTIPLIER { get; private set; }
-    [DataMember] public float MAX_AIR_VELOCITY { get; private set; }
-    [DataMember] public float FORWARD_VELOCITY_DAMPER { get; private set; } 
-    [DataMember] public float AIR_VELOCITY_MULTIPLIER { get; private set; }
-    [DataMember] public float GROUND_VELOCITY_MULTIPLIER { get; private set; }
+    [DataMember] public SyncedEntry<float> MAX_JUMP_DURATION { get; private set; }
+    [DataMember] public SyncedEntry<float> ROTATION_THRESHOLD { get; private set; }
+    [DataMember] public SyncedEntry<float> JUMP_TIME_MULTIPLIER { get; private set; }
+    [DataMember] public SyncedEntry<float> MAX_AIR_VELOCITY { get; private set; }
+    [DataMember] public SyncedEntry<float> FORWARD_VELOCITY_DAMPER { get; private set; } 
+    [DataMember] public SyncedEntry<float> AIR_VELOCITY_MULTIPLIER { get; private set; }
+    [DataMember] public SyncedEntry<float> GROUND_VELOCITY_MULTIPLIER { get; private set; }
+    #endregion
 
     [NonSerialized]
     readonly ConfigFile configFile;
@@ -72,49 +75,53 @@ public class Config : SyncedInstance<Config> {
     }
 
     private T NewEntry<T>(ConfigCategory category, string key, T defaultVal, string desc) {
-        return configFile.Bind(category.Value, key, defaultVal, desc).Value;
+        return configFile.BindPrimitive(category.Value, key, defaultVal, desc);
+    }
+
+    private SyncedEntry<T> NewSyncedEntry<T>(ConfigCategory category, string key, T defaultVal, string desc) {
+        return configFile.BindSyncedEntry(category.Value, key, defaultVal, desc);
     }
 
     public void InitBindings() {
         #region General Values (Enable plugin, debugging etc)
         DISPLAY_DEBUG_INFO = NewEntry("bDisplayDebugInfo", false, "Whether to display coordinates, velocity and other debug info.");
 
-        SYNC_TO_CLIENTS = NewEntry("bSyncToClients", true,
+        SYNC_TO_CLIENTS = NewSyncedEntry(ConfigCategory.GENERAL, "bSyncToClients", true,
             "As the host, should clients be forced to use our config values?\n" +
             "Setting this to `false` will allow clients to use their own config."
         );
         #endregion
 
         #region Movement Related Values (Speeds, Fall Damage)
-        HOLD_TO_CROUCH = NewEntry(ConfigCategory.MOVEMENT, "bHoldToCrouch", true, 
-            "Whether the player should hold to crouch instead of a toggle.\n" +
-            "NOTE: This setting is client-side and cannot be forced by the host."
-        );
-
-        MOVEMENT_SPEED = NewEntry(ConfigCategory.MOVEMENT, "fMovementSpeed", 4.1f,
+        MOVEMENT_SPEED = NewSyncedEntry(ConfigCategory.MOVEMENT, "fMovementSpeed", 4.1f,
             "The base speed at which the player moves. This is NOT a multiplier."
         );
 
-        CLIMB_SPEED = NewEntry(ConfigCategory.MOVEMENT, "fClimbSpeed", 3.9f,
+        CLIMB_SPEED = NewSyncedEntry(ConfigCategory.MOVEMENT, "fClimbSpeed", 3.9f,
             "The base speed at which the player climbs. This is NOT a multiplier."
         );
 
-        SINK_SPEED_MULTIPLIER = NewEntry(ConfigCategory.MOVEMENT, "fSinkSpeedMultiplier", 0.16f,
+        SINK_SPEED_MULTIPLIER = NewSyncedEntry(ConfigCategory.MOVEMENT, "fSinkSpeedMultiplier", 0.16f,
             "Value to multiply the sinking speed by when in quicksand.\n" +
             "Don't want to sink as fast? Decrease this value."
         );
 
-        REMOVE_FIRST_JUMP_DELAY = NewEntry(ConfigCategory.MOVEMENT, "bRemoveFirstJumpDelay", true,
+        HOLD_TO_CROUCH = NewSyncedEntry(ConfigCategory.MOVEMENT, "bHoldToCrouch", true, 
+            "Whether the player should hold to crouch instead of a toggle.\n" +
+            "NOTE: This setting is client-side and cannot be forced by the host."
+        );
+
+        REMOVE_FIRST_JUMP_DELAY = NewSyncedEntry(ConfigCategory.MOVEMENT, "bRemoveFirstJumpDelay", true,
             "Removes the immediate jump delay of 150ms after jumping."
         );
 
-        REMOVE_SECOND_JUMP_DELAY = NewEntry(ConfigCategory.MOVEMENT, "bRemoveSecondJumpDelay", true,
+        REMOVE_SECOND_JUMP_DELAY = NewSyncedEntry(ConfigCategory.MOVEMENT, "bRemoveSecondJumpDelay", true,
             "Removes the jump delay of 100ms before jumping can end."
         );
 
-        FALL_DAMAGE_ENABLED = NewEntry(ConfigCategory.MOVEMENT, "bFallDamageEnabled", true, "Whether you take fall damage. 4Head");
+        FALL_DAMAGE_ENABLED = NewSyncedEntry(ConfigCategory.MOVEMENT, "bFallDamageEnabled", true, "Whether you take fall damage. 4Head");
 
-        FALL_DAMAGE = NewEntry(ConfigCategory.MOVEMENT, "fFallDamage", 16.5f,
+        FALL_DAMAGE = NewSyncedEntry(ConfigCategory.MOVEMENT, "fFallDamage", 16.5f,
             "How much base HP the player loses from every fall. Clamped between 0-100."
         );
 
@@ -141,50 +148,50 @@ public class Config : SyncedInstance<Config> {
         //    "Whether jumping costs the player some of their stamina."
         //);
 
-        INFINITE_STAMINA = NewEntry(ConfigCategory.STAMINA, "bInfiniteStamina", true,
+        INFINITE_STAMINA = NewSyncedEntry(ConfigCategory.STAMINA, "bInfiniteStamina", true,
             "Whether the player has infinite stamina (essential for bhopping).\n" +
             "Only applies wherever bhopping is allowed.\n" +
             "NOTE: THIS WILL BE REPLACED IN FUTURE."
         );
 
         // Native sprint meter is clamped between 0 and 1.
-        MAX_STAMINA = NewEntry(ConfigCategory.STAMINA, "fMaxStamina", 200f,
+        MAX_STAMINA = NewSyncedEntry(ConfigCategory.STAMINA, "fMaxStamina", 200f,
             "The amount at which the sprint meter (aka stamina) is considered full.\nClamped between 0 and 1 in the base game."
         );
         #endregion
 
         #region Bhop Related Values (Velocity, Jumping, Rotation)
-        BHOP_IN_FACTORY = NewEntry(ConfigCategory.BHOP, "bBhopInFactory", false, "Whether bhopping (not general movement) is allowed inside the factory.");
-        BHOP_IN_SHIP = NewEntry(ConfigCategory.BHOP, "bBhopInFactory", false, "Whether bhopping (not general movement) is allowed inside the ship.");
+        BHOP_IN_FACTORY = NewSyncedEntry(ConfigCategory.BHOP, "bBhopInFactory", false, "Whether bhopping (not general movement) is allowed inside the factory.");
+        BHOP_IN_SHIP = NewSyncedEntry(ConfigCategory.BHOP, "bBhopInFactory", false, "Whether bhopping (not general movement) is allowed inside the ship.");
 
-        MAX_JUMP_DURATION = NewEntry(ConfigCategory.BHOP, "fMaxJumpDuration", 0.0025f,
+        MAX_JUMP_DURATION = NewSyncedEntry(ConfigCategory.BHOP, "fMaxJumpDuration", 0.0025f,
             "The maximum amount of time a jump can last for."
         );
 
-        ROTATION_THRESHOLD = NewEntry(ConfigCategory.BHOP, "fRotationThreshold", 0.0115f,
+        ROTATION_THRESHOLD = NewSyncedEntry(ConfigCategory.BHOP, "fRotationThreshold", 0.0115f,
             "The magnitude at which to begin applying velocity. Higher = more rotation required."
         );
 
-        JUMP_TIME_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fJumpTimeMultiplier", 29f,
+        JUMP_TIME_MULTIPLIER = NewSyncedEntry(ConfigCategory.BHOP, "fJumpTimeMultiplier", 29f,
             "The value to multiply 'jump time' by, affecting how quickly you hit MaxJumpDuration.\n" +
             "Lower values will cause the player to feel more weightless."
         );
 
-        MAX_AIR_VELOCITY = NewEntry(ConfigCategory.BHOP, "fMaxAirVelocity", 60f,
+        MAX_AIR_VELOCITY = NewSyncedEntry(ConfigCategory.BHOP, "fMaxAirVelocity", 60f,
             "The value at which velocity will stop being applied when airborne."
         );
 
-        FORWARD_VELOCITY_DAMPER = NewEntry(ConfigCategory.BHOP, "fForwardVelocityDamper", 1.65f, 
+        FORWARD_VELOCITY_DAMPER = NewSyncedEntry(ConfigCategory.BHOP, "fForwardVelocityDamper", 1.65f, 
             "After jumping, a forward velocity is applied - which is first dampened by this value.\n" +
             "Note: Increasing this value too much may hinder bhopping."
         );
 
-        AIR_VELOCITY_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fAirVelocityMultiplier", 0.0046f,
+        AIR_VELOCITY_MULTIPLIER = NewSyncedEntry(ConfigCategory.BHOP, "fAirVelocityMultiplier", 0.0046f,
             "The value to multiply the player's velocity by when airborne.\n" +
             "Note: Do not let the small value fool you, anything above the default is veryy fast!"
         );
 
-        GROUND_VELOCITY_MULTIPLIER = NewEntry(ConfigCategory.BHOP, "fGroundVelocityMultiplier", 1.9f,
+        GROUND_VELOCITY_MULTIPLIER = NewSyncedEntry(ConfigCategory.BHOP, "fGroundVelocityMultiplier", 1.9f,
             "The value determining how quickly velocity decreases when not airborne.\n" +
             "Essentially, this affects how much the player is slowed down when hitting the ground."
         );
@@ -194,7 +201,7 @@ public class Config : SyncedInstance<Config> {
     internal static void RequestSync() {
         if (!IsClient) return;
 
-        using FastBufferWriter stream = new(INT_SIZE, Allocator.Temp);
+        using FastBufferWriter stream = new(IntSize, Allocator.Temp);
 
         // Method `OnRequestSync` will then get called on host.
         stream.SendMessage("MCE_OnRequestConfigSync");
@@ -203,12 +210,12 @@ public class Config : SyncedInstance<Config> {
     internal static void OnRequestSync(ulong clientId, FastBufferReader _) {
         if (!IsHost) return;
 
-        LogDebug($"Config sync request received from client: {clientId}");
+        Plugin.Logger.LogDebug($"Config sync request received from client: {clientId}");
 
         byte[] array = SerializeToBytes(Instance);
         int value = array.Length;
 
-        using FastBufferWriter stream = new(value + INT_SIZE, Allocator.Temp);
+        using FastBufferWriter stream = new(value + IntSize, Allocator.Temp);
 
         try {
             stream.WriteValueSafe(in value, default);
@@ -216,26 +223,31 @@ public class Config : SyncedInstance<Config> {
 
             stream.SendMessage("MCE_OnReceiveConfigSync", clientId);
         } catch(Exception e) {
-            LogErr($"Error occurred syncing config with client: {clientId}\n{e}");
+            Plugin.Logger.LogError($"Error occurred syncing config with client: {clientId}\n{e}");
         }
     }
 
     internal static void OnReceiveSync(ulong _, FastBufferReader reader) {
-        if (!reader.TryBeginRead(INT_SIZE)) {
-            LogErr("Config sync error: Could not begin reading buffer.");
+        if (!reader.TryBeginRead(IntSize)) {
+            Plugin.Logger.LogError("Config sync error: Could not begin reading buffer.");
             return;
         }
 
         reader.ReadValueSafe(out int val, default);
         if (!reader.TryBeginRead(val)) {
-            LogErr("Config sync error: Host could not sync.");
+            Plugin.Logger.LogError("Config sync error: Host could not sync.");
             return;
         }
 
         byte[] data = new byte[val];
         reader.ReadBytesSafe(ref data, val);
 
-        SyncInstance(data);
+        try {
+            SyncInstance(data);
+        } catch(Exception e) {
+            Plugin.Logger.LogError($"Error syncing config instance!\n{e}");
+        }
+
         PlayerControllerPatch.movementScript.ApplyConfigSpeeds();
     }
 }

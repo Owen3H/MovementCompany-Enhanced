@@ -8,7 +8,7 @@ internal class NetworkManagerPatch {
     [HarmonyPostfix]
     [HarmonyPatch("StartDisconnect")]
     public static void PlayerLeave() {
-        if (!Config.Default.SYNC_TO_CLIENTS)
+        if (!Config.Default.SYNC_TO_CLIENTS.Value)
             return;
 
         Config.RevertSync();

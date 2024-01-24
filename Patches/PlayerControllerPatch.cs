@@ -20,10 +20,10 @@ namespace MovementCompanyEnhanced.Patches;
 internal class PlayerControllerPatch {
     internal static CustomMovement movementScript;
 
-    static bool crouchHeld = false;
+    //static bool crouchHeld = false;
 
-    static bool removeFirstDelay => Config.Instance.REMOVE_FIRST_JUMP_DELAY;
-    static bool removeSecondDelay => Config.Instance.REMOVE_SECOND_JUMP_DELAY;
+    static bool removeFirstDelay => Config.Instance.REMOVE_FIRST_JUMP_DELAY.Value;
+    static bool removeSecondDelay => Config.Instance.REMOVE_SECOND_JUMP_DELAY.Value;
 
     static InputActionAsset Actions => IngamePlayerSettings.Instance.playerInput.actions;
 
@@ -99,8 +99,8 @@ internal class PlayerControllerPatch {
     [HarmonyPrefix]
     [HarmonyPatch("DamagePlayer")]
     public static bool OverrideFallDamage(ref int damageNumber, ref bool fallDamage) {
-        if (Config.Default.FALL_DAMAGE_ENABLED) {
-            damageNumber = Mathf.Clamp(Mathf.RoundToInt(Config.Instance.FALL_DAMAGE), 0, 100);
+        if (Config.Default.FALL_DAMAGE_ENABLED.Value) {
+            damageNumber = Mathf.Clamp(Mathf.RoundToInt(Config.Instance.FALL_DAMAGE.Value), 0, 100);
             return true;
         }
 
@@ -117,7 +117,7 @@ internal class PlayerControllerPatch {
     [HarmonyPatch("Crouch_performed")]
     public static bool OnCrouch() {
         // Disable crouch toggle
-        if (Config.Default.HOLD_TO_CROUCH) {
+        if (Config.Default.HOLD_TO_CROUCH.Value) {
             movementScript.player.Crouch(true);
 
             return false;
@@ -129,7 +129,7 @@ internal class PlayerControllerPatch {
     [HarmonyPrefix]
     [HarmonyPatch("OnEnable")]
     public static void CrouchHold() {
-        if (!Config.Default.HOLD_TO_CROUCH) return;
+        if (!Config.Default.HOLD_TO_CROUCH.Value) return;
 
         InputAction crouchAction = Actions.FindAction("Crouch", true);
         RegisterActionCancel(crouchAction, CrouchCanceled);
@@ -146,6 +146,6 @@ internal class PlayerControllerPatch {
 
     static void CrouchCanceled(CallbackContext _) {
         movementScript.player.Crouch(false);
-        crouchHeld = false;
+        //crouchHeld = false;
     }
 }
