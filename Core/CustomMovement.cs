@@ -21,7 +21,7 @@ internal class CustomMovement : MonoBehaviour {
     Vector3 previousForward;
 
     void OnGUI() {
-        if (!Config.Default.DISPLAY_DEBUG_INFO) return;
+        if (!Config.Default.DISPLAY_DEBUG_INFO.Value) return;
         if (player.thisController == null) return;
 
         Vector3 pos = player.thisController.transform.position;

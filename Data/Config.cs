@@ -27,9 +27,12 @@ public struct ConfigCategory {
 
 [DataContract]
 public class Config : SyncedInstance<Config> {
-    #region Vars
+    #region Client-side entries
     public ConfigEntry<bool> PLUGIN_ENABLED { get; private set; }
-    public bool DISPLAY_DEBUG_INFO { get; private set; }
+    public ConfigEntry<bool> DISPLAY_DEBUG_INFO { get; private set; }
+    #endregion
+
+    #region Synced entries
     [DataMember] public SyncedEntry<bool> SYNC_TO_CLIENTS { get; private set; }
 
     [DataMember] public SyncedEntry<bool> HOLD_TO_CROUCH { get; private set; }
@@ -42,8 +45,8 @@ public class Config : SyncedInstance<Config> {
 
     [DataMember] public SyncedEntry<bool> FALL_DAMAGE_ENABLED { get; private set; }
     [DataMember] public SyncedEntry<float> FALL_DAMAGE { get; private set; }
-    //public bool FALL_DAMAGE_WEIGHT_AFFECTED { get; private set; }
-    //public float FALL_DAMAGE_WEIGHT_MULTIPLIER { get; private set; }
+    //[DataMember] public SyncedEntry<bool> FALL_DAMAGE_WEIGHT_AFFECTED { get; private set; }
+    //[DataMember] public SyncedEntry<float> FALL_DAMAGE_WEIGHT_MULTIPLIER { get; private set; }
 
     [DataMember] public SyncedEntry<bool> INFINITE_STAMINA { get; private set; }
     [DataMember] public SyncedEntry<float> MAX_STAMINA { get; private set; }
@@ -67,24 +70,25 @@ public class Config : SyncedInstance<Config> {
         InitInstance(this);
 
         configFile = cfg;
-        PLUGIN_ENABLED = cfg.Bind(ConfigCategory.GENERAL.Value, "bEnabled", true, "Enable or disable the plugin globally.");
+        PLUGIN_ENABLED = NewEntry(ConfigCategory.GENERAL, "bEnabled", true, "Enable or disable the plugin globally.");
     }
 
-    private T NewEntry<T>(string key, T defaultVal, string desc) {
-        return NewEntry(ConfigCategory.GENERAL, key, defaultVal, desc);
+    private ConfigEntry<V> NewEntry<V>(ConfigCategory category, string key, V defaultVal, string desc) {
+        return configFile.Bind(category.Value, key, defaultVal, desc);
     }
 
-    private T NewEntry<T>(ConfigCategory category, string key, T defaultVal, string desc) {
-        return configFile.BindPrimitive(category.Value, key, defaultVal, desc);
-    }
-
-    private SyncedEntry<T> NewSyncedEntry<T>(ConfigCategory category, string key, T defaultVal, string desc) {
+    private SyncedEntry<V> NewSyncedEntry<V>(
+        ConfigCategory category, string key, 
+        V defaultVal, string desc
+    ) where V : unmanaged {
         return configFile.BindSyncedEntry(category.Value, key, defaultVal, desc);
     }
 
     public void InitBindings() {
         #region General Values (Enable plugin, debugging etc)
-        DISPLAY_DEBUG_INFO = NewEntry("bDisplayDebugInfo", false, "Whether to display coordinates, velocity and other debug info.");
+        DISPLAY_DEBUG_INFO = NewEntry(ConfigCategory.GENERAL,
+            "bDisplayDebugInfo", false, "Whether to display coordinates, velocity and other debug info."
+        );
 
         SYNC_TO_CLIENTS = NewSyncedEntry(ConfigCategory.GENERAL, "bSyncToClients", true,
             "As the host, should clients be forced to use our config values?\n" +
