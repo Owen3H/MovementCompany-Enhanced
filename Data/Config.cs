@@ -28,7 +28,7 @@ public struct ConfigCategory {
 [DataContract]
 public class Config : SyncedInstance<Config> {
     #region Vars
-    public bool PLUGIN_ENABLED { get; private set; }
+    public ConfigEntry<bool> PLUGIN_ENABLED { get; private set; }
     public bool DISPLAY_DEBUG_INFO { get; private set; }
     [DataMember] public SyncedEntry<bool> SYNC_TO_CLIENTS { get; private set; }
 
@@ -67,7 +67,7 @@ public class Config : SyncedInstance<Config> {
         InitInstance(this);
 
         configFile = cfg;
-        PLUGIN_ENABLED = NewEntry("bEnabled", true, "Enable or disable the plugin globally.");
+        PLUGIN_ENABLED = cfg.Bind(ConfigCategory.GENERAL.Value, "bEnabled", true, "Enable or disable the plugin globally.");
     }
 
     private T NewEntry<T>(string key, T defaultVal, string desc) {

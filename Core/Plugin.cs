@@ -42,7 +42,7 @@ public class Plugin : BaseUnityPlugin {
     }
 
     public bool PluginEnabled(bool logIfDisabled = false) {
-        bool enabled = Config.PLUGIN_ENABLED;
+        bool enabled = Config.PLUGIN_ENABLED.Value;
         if (!enabled && logIfDisabled) {
             Logger.LogInfo("MovementCompanyEnhanced disabled globally.");
         }
