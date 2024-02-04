@@ -6,12 +6,12 @@ using HarmonyLib;
 namespace MovementCompanyEnhanced.Core;
 
 [BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]
+[BepInDependency("io.github.CSync", BepInDependency.DependencyFlags.SoftDependency)]
 public class Plugin : BaseUnityPlugin {
-    private Harmony patcher;
-
     internal static new ManualLogSource Logger { get; private set; }
-
     public static new Config Config { get; private set; }
+
+    private Harmony patcher;
 
     private void Awake() {
         Logger = base.Logger;
@@ -22,7 +22,9 @@ public class Plugin : BaseUnityPlugin {
         Config.InitBindings();
 
         try {
-            InitPatcher();
+            patcher = new(Metadata.GUID);
+            patcher.PatchAll();
+
             Logger.LogInfo("Plugin loaded.");
         } catch(Exception e) {
             Logger.LogError(e);
@@ -32,13 +34,6 @@ public class Plugin : BaseUnityPlugin {
     public void OnDestroy() {
         if (!PluginEnabled()) return;
         LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
-    }
-
-    public void InitPatcher() {
-        patcher = new(Metadata.GUID);
-        patcher.PatchAll();
-
-        //LogPatches();
     }
 
     public bool PluginEnabled(bool logIfDisabled = false) {
