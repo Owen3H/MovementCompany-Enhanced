@@ -3,9 +3,12 @@ A maintained version of 2018's [Movement-Company](https://github.com/u-2018/Move
 PRs welcome :)
 
 # Installation
+It is recommended to use a mod manager such as [r2modman](https://github.com/ebkr/r2modmanPlus) to handle installing the mod and its dependencies.
+
 1. Install [BepInEx](https://github.com/BepInEx/BepInEx/releases) v5 into your game.
 2. Install the [LC API](https://thunderstore.io/c/lethal-company/p/2018/LC_API/) into your game.
-3. Download `MovementCompanyEnhanced.dll` and drop it into `Lethal Company\BepInEx\plugins`.
+3. Install the [CSync](https://thunderstore.io/c/lethal-company/p/Owen3H/CSync/) library into your game.
+4. Download `MovementCompanyEnhanced.dll` and drop it into `Lethal Company\BepInEx\plugins`.
 
 ## Goals
 - Option for bhopping to drain stamina.
