@@ -7,6 +7,7 @@ namespace MovementCompanyEnhanced.Core;
 
 [BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]
 [BepInDependency("io.github.CSync", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("LC_API", BepInDependency.DependencyFlags.HardDependency)]
 public class Plugin : BaseUnityPlugin {
     internal static new ManualLogSource Logger { get; private set; }
     public static new Config Config { get; private set; }
