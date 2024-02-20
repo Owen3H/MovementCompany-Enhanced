@@ -4,7 +4,7 @@
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>MovementCompanyEnhanced</AssemblyName>
     <Description>General purpose movement mod, fully configurable and allows bhopping.</Description>
-    <Version>1.2.0</Version>
+    <Version>1.2.2</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
@@ -19,6 +19,8 @@
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference Include="LethalCompany.LC-API" Version="3.4.5" />
+    <PackageReference Include="Owen3H.BepInEx.CSync" Version="1.0.8" />
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile" />
   </ItemGroup>
   
@@ -28,29 +30,23 @@
   
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>E:\Programs\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="CSync">
-      <HintPath>E:\Programs\Steam\steamapps\common\Lethal Company\BepInEx\plugins\CSync.dll</HintPath>
-    </Reference>
-    <Reference Include="LC_API">
-      <HintPath>E:\Programs\Steam\steamapps\common\Lethal Company\BepInEx\plugins\LC_API.dll</HintPath>
+      <HintPath>E:\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
-      <HintPath>E:\Programs\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\netstandard.dll</HintPath>
+      <HintPath>E:\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\netstandard.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Collections">
-      <HintPath>E:\Programs\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Collections.dll</HintPath>
+      <HintPath>E:\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Unity.InputSystem">
-      <HintPath>E:\Programs\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.InputSystem.dll</HintPath>
+      <HintPath>E:\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.InputSystem.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Netcode.Runtime">
-      <HintPath>E:\Programs\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
+      <HintPath>E:\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="echo &quot;.&quot; &gt; &quot;E:\Programs\Steam\steamapps\common\Lethal Company\BepInEx\plugins\$(TargetName).dll&quot; &amp;&amp; xcopy /q /y /i &quot;$(TargetPath)&quot; &quot;E:\Programs\Steam\steamapps\common\Lethal Company\BepInEx\plugins\$(TargetName).dll&quot;" />
+    <Exec Command="echo &quot;.&quot; &gt; &quot;E:\SteamLibrary\steamapps\common\Lethal Company\BepInEx\plugins\$(TargetName).dll&quot; &amp;&amp; xcopy /q /y /i &quot;$(TargetPath)&quot; &quot;E:\SteamLibrary\steamapps\common\Lethal Company\BepInEx\plugins\$(TargetName).dll&quot;" />
   </Target>
 </Project>

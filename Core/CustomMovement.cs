@@ -50,19 +50,19 @@ internal class CustomMovement : MonoBehaviour {
     void Update() {
         if (!player) return;
 
-        if (player.isInHangarShipRoom && !cfg.BHOP_IN_SHIP.Value) {
+        if (player.isInHangarShipRoom && !cfg.BHOP_IN_SHIP) {
             return;
         }
 
-        if (player.isInsideFactory && !cfg.BHOP_IN_FACTORY.Value) {
+        if (player.isInsideFactory && !cfg.BHOP_IN_FACTORY) {
             return;
         }
 
         bool jumping = player.playerBodyAnimator?.GetBool("Jumping") ?? false;
 
         // Allows infinite bhopping by keeping the "sprint meter" full.
-        if (cfg.INFINITE_STAMINA.Value) {
-            SetStamina(cfg.MAX_STAMINA.Value);
+        if (cfg.INFINITE_STAMINA) {
+            SetStamina(cfg.MAX_STAMINA);
         }
 
         UpdateJumpTime(jumping);
@@ -83,20 +83,20 @@ internal class CustomMovement : MonoBehaviour {
 
         Plugin.Logger.LogDebug($"{prefix} - move speed set to: {cfg?.MOVEMENT_SPEED?.Value}");
 
-        player.movementSpeed = ValNonNegative(cfg.MOVEMENT_SPEED.Value);
-        player.climbSpeed = ValNonNegative(cfg.CLIMB_SPEED.Value);
-        player.sinkingSpeedMultiplier = ValNonNegative(cfg.SINK_SPEED_MULTIPLIER.Value);
+        player.movementSpeed = ValNonNegative(cfg.MOVEMENT_SPEED);
+        player.climbSpeed = ValNonNegative(cfg.CLIMB_SPEED);
+        player.sinkingSpeedMultiplier = ValNonNegative(cfg.SINK_SPEED_MULTIPLIER);
     }
 
     private void UpdateJumpTime(bool jumping) {
-        if (jumping && jumpTime < cfg.MAX_JUMP_DURATION.Value) {
+        if (jumping && jumpTime < cfg.MAX_JUMP_DURATION) {
             player.fallValue = player.jumpForce;
-            jumpTime += Time.deltaTime * cfg.JUMP_TIME_MULTIPLIER.Value / 100;
+            jumpTime += Time.deltaTime * cfg.JUMP_TIME_MULTIPLIER / 100;
         }
     }
 
     private void LerpToGround() {
-        float timeToGround = Time.deltaTime * cfg.GROUND_VELOCITY_MULTIPLIER.Value;
+        float timeToGround = Time.deltaTime * cfg.GROUND_VELOCITY_MULTIPLIER;
         wantedVelToAdd = Vector3.Lerp(wantedVelToAdd, Vector3.zero, timeToGround);
 
         inAir = false;
@@ -106,15 +106,15 @@ internal class CustomMovement : MonoBehaviour {
     private void ApplyBhop() {
         if (!inAir) {
             inAir = true;
-            AddJumpVelocity(cfg.AIR_VELOCITY_MULTIPLIER.Value);
+            AddJumpVelocity(cfg.AIR_VELOCITY_MULTIPLIER);
         }
 
         wantedVelToAdd.y = 0;
 
         // TODO: Check if player is walking/sprinting before doing this.
         // Currently, stationary jumping will move them forward :/
-        MovePlayer(CurrentForward() * (wantedVelToAdd.magnitude / cfg.FORWARD_VELOCITY_DAMPER.Value));
-        AddRotationVelocity(cfg.ROTATION_THRESHOLD.Value);
+        MovePlayer(CurrentForward() * (wantedVelToAdd.magnitude / cfg.FORWARD_VELOCITY_DAMPER));
+        AddRotationVelocity(cfg.ROTATION_THRESHOLD);
     }
 
     private void AddJumpVelocity(float multiplier) {
@@ -158,7 +158,7 @@ internal class CustomMovement : MonoBehaviour {
     }
 
     public bool ReachedMaxVelocity() {
-        return CurrentVelocity() >= cfg.MAX_AIR_VELOCITY.Value;
+        return CurrentVelocity() >= cfg.MAX_AIR_VELOCITY;
     }
 
     private void SetStamina(float val) {
