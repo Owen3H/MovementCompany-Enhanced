@@ -2,6 +2,7 @@ using System;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using LC_API.ServerAPI;
 
 namespace MovementCompanyEnhanced.Core;
 
@@ -34,7 +35,7 @@ public class Plugin : BaseUnityPlugin {
 
     public void OnDestroy() {
         if (!PluginEnabled()) return;
-        LC_API.ServerAPI.ModdedServer.SetServerModdedOnly();
+        ModdedServer.SetServerModdedOnly();
     }
 
     public bool PluginEnabled(bool logIfDisabled = false) {
