@@ -22,8 +22,8 @@ internal class PlayerControllerPatch {
 
     //static bool crouchHeld = false;
 
-    static bool removeFirstDelay => Config.Instance.REMOVE_FIRST_JUMP_DELAY.Value;
-    static bool removeSecondDelay => Config.Instance.REMOVE_SECOND_JUMP_DELAY.Value;
+    static bool removeFirstDelay => Config.Instance.REMOVE_FIRST_JUMP_DELAY;
+    static bool removeSecondDelay => Config.Instance.REMOVE_SECOND_JUMP_DELAY;
 
     static InputActionAsset Actions => IngamePlayerSettings.Instance.playerInput.actions;
 
@@ -99,8 +99,8 @@ internal class PlayerControllerPatch {
     [HarmonyPrefix]
     [HarmonyPatch("DamagePlayer")]
     public static bool OverrideFallDamage(ref int damageNumber, ref bool fallDamage) {
-        if (Config.Default.FALL_DAMAGE_ENABLED.Value) {
-            damageNumber = Mathf.Clamp(Mathf.RoundToInt(Config.Instance.FALL_DAMAGE.Value), 0, 100);
+        if (Config.Default.FALL_DAMAGE_ENABLED) {
+            damageNumber = Mathf.Clamp(Mathf.RoundToInt(Config.Instance.FALL_DAMAGE), 0, 100);
             return true;
         }
 
@@ -117,7 +117,7 @@ internal class PlayerControllerPatch {
     [HarmonyPatch("Crouch_performed")]
     public static bool OnCrouch() {
         // Disable crouch toggle
-        if (Config.Default.HOLD_TO_CROUCH.Value) {
+        if (Config.Default.HOLD_TO_CROUCH) {
             movementScript.player.Crouch(true);
 
             return false;
@@ -129,7 +129,7 @@ internal class PlayerControllerPatch {
     [HarmonyPrefix]
     [HarmonyPatch("OnEnable")]
     public static void CrouchHold() {
-        if (!Config.Default.HOLD_TO_CROUCH.Value) return;
+        if (!Config.Default.HOLD_TO_CROUCH) return;
 
         InputAction crouchAction = Actions.FindAction("Crouch", true);
         RegisterActionCancel(crouchAction, CrouchCanceled);

@@ -20,15 +20,17 @@ internal class CustomMovement : MonoBehaviour {
 
     Vector3 previousForward;
 
+    double Round (float val) => Math.Round(val, 3);
+
     void OnGUI() {
         if (!Config.Default.DISPLAY_DEBUG_INFO.Value) return;
         if (player.thisController == null) return;
 
         Vector3 pos = player.thisController.transform.position;
-        GUI.Label(new(10, 10, 500, 500), Vec3ToString(pos));
+        GUI.Label(new(10, 10, 500, 500), pos.ToString("F3"));
 
-        GUI.Label(new(10, 40, 500, 500), "Current Velocity: " + Math.Round(CurrentVelocity(), 3));
-        GUI.Label(new(10, 60, 500, 500), "Wanted Velocity: " + Math.Round(wantedVelToAdd.magnitude, 3));
+        GUI.Label(new(10, 40, 500, 500), $"Current Velocity: {Round(CurrentVelocity())}");
+        GUI.Label(new(10, 60, 500, 500), $"Wanted Velocity: {Round(wantedVelToAdd.magnitude)}");
 
         GUI.Label(new(10, 90, 500, 500), "Jump Time: " + jumpTime);
         GUI.Label(new(10, 110, 500, 500), "Airborne: " + inAir);
@@ -89,10 +91,11 @@ internal class CustomMovement : MonoBehaviour {
     }
 
     private void UpdateJumpTime(bool jumping) {
-        if (jumping && jumpTime < cfg.MAX_JUMP_DURATION) {
-            player.fallValue = player.jumpForce;
-            jumpTime += Time.deltaTime * cfg.JUMP_TIME_MULTIPLIER / 100;
-        }
+        if (!jumping || jumpTime >= cfg.MAX_JUMP_DURATION)
+            return;
+
+        player.fallValue = player.jumpForce;
+        jumpTime += Time.deltaTime * cfg.JUMP_TIME_MULTIPLIER / 100;
     }
 
     private void LerpToGround() {
@@ -142,7 +145,7 @@ internal class CustomMovement : MonoBehaviour {
     }
 
     private void MovePlayer(float x, float y, float z) {
-        player.thisController.Move(new Vector3(x, y, z));
+        player.thisController.Move(new(x, y, z));
     }
 
     public bool Airborne() {
@@ -172,13 +175,5 @@ internal class CustomMovement : MonoBehaviour {
         }
 
         return newVal;
-    }
-
-    public string Vec3ToString(Vector3 vec) {
-        float x = (float) Math.Round(vec.x, 1);
-        float y = (float) Math.Round(vec.y, 1);
-        float z = (float) Math.Round(vec.z, 1);
-
-        return $"X: {x}, Y: {y}, Z: {z}";
     }
 }
