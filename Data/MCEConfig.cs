@@ -1,13 +1,10 @@
 using System;
 using BepInEx.Configuration;
 
-using MovementCompanyEnhanced.Patches;
-
-using Unity.Netcode;
-using Unity.Collections;
 using System.Runtime.Serialization;
 using CSync.Lib;
 using CSync.Util;
+using MovementCompanyEnhanced.Patches;
 
 namespace MovementCompanyEnhanced.Core;
 
@@ -26,7 +23,7 @@ public struct ConfigCategory {
 }
 
 [DataContract]
-public class Config : SyncedInstance<Config> {
+public class MCEConfig : SyncedConfig<MCEConfig> {
     #region Client-side entries
     public ConfigEntry<bool> PLUGIN_ENABLED { get; private set; }
     public ConfigEntry<bool> DISPLAY_DEBUG_INFO { get; private set; }
@@ -66,23 +63,20 @@ public class Config : SyncedInstance<Config> {
     [NonSerialized]
     readonly ConfigFile configFile;
 
-    public Config(ConfigFile cfg) {
-        InitInstance(this);
+    public MCEConfig(ConfigFile cfg) : base("MCE") {
+        ConfigManager.Register(this);
 
         configFile = cfg;
         PLUGIN_ENABLED = NewEntry(ConfigCategory.GENERAL, "bEnabled", true, "Enable or disable the plugin globally.");
+
+        SyncComplete += ApplySpeedsAfterSync;
     }
 
-    private ConfigEntry<V> NewEntry<V>(ConfigCategory category, string key, V defaultVal, string desc) {
-        return configFile.Bind(category.Value, key, defaultVal, desc);
-    }
+    private ConfigEntry<V> NewEntry<V>(ConfigCategory category, string key, V defaultVal, string desc) =>
+        configFile.Bind(category.Value, key, defaultVal, desc);
 
-    private SyncedEntry<V> NewSyncedEntry<V>(
-        ConfigCategory category, string key, 
-        V defaultVal, string desc
-    ) where V : unmanaged {
-        return configFile.BindSyncedEntry(category.Value, key, defaultVal, desc);
-    }
+    private SyncedEntry<V> NewSyncedEntry<V>(ConfigCategory category, string key, V defaultVal, string desc) =>
+        configFile.BindSyncedEntry(category.Value, key, defaultVal, desc);
 
     public void InitBindings() {
         #region General Values (Enable plugin, debugging etc)
@@ -202,56 +196,59 @@ public class Config : SyncedInstance<Config> {
         #endregion
     }
 
-    internal static void RequestSync() {
-        if (!IsClient) return;
-
-        using FastBufferWriter stream = new(IntSize, Allocator.Temp);
-
-        // Method `OnRequestSync` will then get called on host.
-        stream.SendMessage("MCE_OnRequestConfigSync");
-    }
-
-    internal static void OnRequestSync(ulong clientId, FastBufferReader _) {
-        if (!IsHost) return;
-
-        Plugin.Logger.LogDebug($"Config sync request received from client: {clientId}");
-
-        byte[] array = SerializeToBytes(Instance);
-        int value = array.Length;
-
-        using FastBufferWriter stream = new(value + IntSize, Allocator.Temp);
-
-        try {
-            stream.WriteValueSafe(in value, default);
-            stream.WriteBytesSafe(array);
-
-            stream.SendMessage("MCE_OnReceiveConfigSync", clientId);
-        } catch(Exception e) {
-            Plugin.Logger.LogError($"Error occurred syncing config with client: {clientId}\n{e}");
-        }
-    }
-
-    internal static void OnReceiveSync(ulong _, FastBufferReader reader) {
-        if (!reader.TryBeginRead(IntSize)) {
-            Plugin.Logger.LogError("Config sync error: Could not begin reading buffer.");
-            return;
-        }
-
-        reader.ReadValueSafe(out int val, default);
-        if (!reader.TryBeginRead(val)) {
-            Plugin.Logger.LogError("Config sync error: Host could not sync.");
-            return;
-        }
-
-        byte[] data = new byte[val];
-        reader.ReadBytesSafe(ref data, val);
-
-        try {
-            SyncInstance(data);
-        } catch(Exception e) {
-            Plugin.Logger.LogError($"Error syncing config instance!\n{e}");
-        }
-
+    void ApplySpeedsAfterSync(object s, EventArgs e) => 
         PlayerControllerPatch.movementScript.ApplyConfigSpeeds();
-    }
+
+    //internal static void RequestSync() {
+    //    if (!IsClient) return;
+
+    //    using FastBufferWriter stream = new(IntSize, Allocator.Temp);
+
+    //    // Method `OnRequestSync` will then get called on host.
+    //    stream.SendMessage("MCE_OnRequestConfigSync");
+    //}
+
+    //internal static void OnRequestSync(ulong clientId, FastBufferReader _) {
+    //    if (!IsHost) return;
+
+    //    Plugin.Logger.LogDebug($"Config sync request received from client: {clientId}");
+
+    //    byte[] array = SerializeToBytes(Instance);
+    //    int value = array.Length;
+
+    //    using FastBufferWriter stream = new(value + IntSize, Allocator.Temp);
+
+    //    try {
+    //        stream.WriteValueSafe(in value, default);
+    //        stream.WriteBytesSafe(array);
+
+    //        stream.SendMessage("MCE_OnReceiveConfigSync", clientId);
+    //    } catch(Exception e) {
+    //        Plugin.Logger.LogError($"Error occurred syncing config with client: {clientId}\n{e}");
+    //    }
+    //}
+
+    //internal static void OnReceiveSync(ulong _, FastBufferReader reader) {
+    //    if (!reader.TryBeginRead(IntSize)) {
+    //        Plugin.Logger.LogError("Config sync error: Could not begin reading buffer.");
+    //        return;
+    //    }
+
+    //    reader.ReadValueSafe(out int val, default);
+    //    if (!reader.TryBeginRead(val)) {
+    //        Plugin.Logger.LogError("Config sync error: Host could not sync.");
+    //        return;
+    //    }
+
+    //    byte[] data = new byte[val];
+    //    reader.ReadBytesSafe(ref data, val);
+
+    //    try {
+    //        SyncInstance(data);
+    //    } catch(Exception e) {
+    //        Plugin.Logger.LogError($"Error syncing config instance!\n{e}");
+    //    }
+
+    //    PlayerControllerPatch.movementScript.ApplyConfigSpeeds();
+    //}
 }

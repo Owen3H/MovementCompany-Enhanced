@@ -8,7 +8,7 @@ namespace MovementCompanyEnhanced.Component;
 internal class CustomMovement : MonoBehaviour {
     public PlayerControllerB player { get; internal set; }
 
-    internal Config cfg => Config.Instance;
+    internal MCEConfig cfg => MCEConfig.Instance;
 
     float jumpTime;
 
@@ -23,7 +23,7 @@ internal class CustomMovement : MonoBehaviour {
     double Round (float val) => Math.Round(val, 3);
 
     void OnGUI() {
-        if (!Config.Default.DISPLAY_DEBUG_INFO.Value) return;
+        if (!MCEConfig.Default.DISPLAY_DEBUG_INFO.Value) return;
         if (player.thisController == null) return;
 
         Vector3 pos = player.thisController.transform.position;
@@ -38,7 +38,7 @@ internal class CustomMovement : MonoBehaviour {
     }
 
     void Start() {
-        if (Config.IsHost) {
+        if (MCEConfig.IsHost) {
             ApplyConfigSpeeds(true);
         }
 

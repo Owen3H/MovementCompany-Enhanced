@@ -11,7 +11,7 @@ namespace MovementCompanyEnhanced.Core;
 [BepInDependency("LC_API", BepInDependency.DependencyFlags.HardDependency)]
 public class Plugin : BaseUnityPlugin {
     internal static new ManualLogSource Logger { get; private set; }
-    public static new Config Config { get; private set; }
+    public static new MCEConfig Config { get; private set; }
 
     private Harmony patcher;
 

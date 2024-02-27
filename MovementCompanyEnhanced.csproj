@@ -20,7 +20,6 @@
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
     <PackageReference Include="LethalCompany.LC-API" Version="3.4.5" />
-    <PackageReference Include="Owen3H.BepInEx.CSync" Version="1.*" />
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile" />
   </ItemGroup>
   
@@ -31,6 +30,9 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>E:\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="CSync">
+      <HintPath>E:\SteamLibrary\steamapps\common\Lethal Company\BepInEx\plugins\CSync.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>E:\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\netstandard.dll</HintPath>
