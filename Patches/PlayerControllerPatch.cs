@@ -27,21 +27,6 @@ internal class PlayerControllerPatch {
 
     static InputActionAsset Actions => IngamePlayerSettings.Instance.playerInput.actions;
 
-    //[HarmonyPostfix]
-    //[HarmonyPatch("ConnectClientToPlayerObject")]
-    //public static void InitializeLocalPlayer() {
-    //    if (MCEConfig.IsHost) {
-    //        MCEConfig.MessageManager.RegisterNamedMessageHandler("MCE_OnRequestConfigSync", MCEConfig.OnRequestSync);
-    //        MCEConfig.Synced = true;
-
-    //        return;
-    //    }
-
-    //    MCEConfig.Synced = false;
-    //    MCEConfig.MessageManager.RegisterNamedMessageHandler("MCE_OnReceiveConfigSync", MCEConfig.OnReceiveSync);
-    //    MCEConfig.Instance.RequestSync();
-    //}
-
     [HarmonyPostfix]
     [HarmonyPatch("SpawnPlayerAnimation")]
     public static void GiveMovementScript(PlayerControllerB __instance) {
