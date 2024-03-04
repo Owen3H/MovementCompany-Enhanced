@@ -82,7 +82,6 @@ internal class CustomMovement : MonoBehaviour {
 
     internal void ApplyConfigSpeeds(bool host = false) {
         var prefix = host ? "Host" : "Client";
-
         Plugin.Logger.LogDebug($"{prefix} - move speed set to: {cfg?.MOVEMENT_SPEED?.Value}");
 
         player.movementSpeed = ValNonNegative(cfg.MOVEMENT_SPEED);

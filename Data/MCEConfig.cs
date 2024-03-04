@@ -63,7 +63,7 @@ public class MCEConfig : SyncedConfig<MCEConfig> {
     [NonSerialized]
     readonly ConfigFile configFile;
 
-    public MCEConfig(ConfigFile cfg) : base("MCE") {
+    public MCEConfig(ConfigFile cfg) : base("MovementCompanyEnhanced") {
         ConfigManager.Register(this);
 
         configFile = cfg;
@@ -194,6 +194,8 @@ public class MCEConfig : SyncedConfig<MCEConfig> {
             "Essentially, this affects how much the player is slowed down when hitting the ground."
         );
         #endregion
+
+        EnableHostSyncControl(SYNC_TO_CLIENTS);
     }
 
     void ApplySpeedsAfterSync(object s, EventArgs e) => 
