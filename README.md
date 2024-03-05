@@ -1,6 +1,9 @@
+> [!WARNING]
+> **THIS PROJECT IS NO LONGER MAINTAINED**<br>
+> **I WILL NOT AFFILIATE WITH THUNDERSTORE OR THE MODDING DISCORD.**
+
 # MovementCompany-Enhanced
-A maintained version of 2018's [Movement-Company](https://github.com/u-2018/Movement-Company).<br>
-PRs welcome :)
+A configurable fork of 2018's [Movement-Company](https://github.com/u-2018/Movement-Company).<br>
 
 # Installation
 It is recommended to use a mod manager such as [r2modman](https://github.com/ebkr/r2modmanPlus) to handle installing the mod and its dependencies.
