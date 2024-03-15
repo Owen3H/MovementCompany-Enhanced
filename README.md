@@ -1,8 +1,8 @@
 # MovementCompany-Enhanced
 A configurable fork of 2018's [Movement-Company](https://github.com/u-2018/Movement-Company).<br>
 
-**Note**: 
-I'm on a temporary break from this project. 
+**Note**:\
+I'm on a temporary break from this project.\
 Join my [discord](https://discord.com/invite/CMyTmUMP2P) to stay updated.
 
 # Installation
