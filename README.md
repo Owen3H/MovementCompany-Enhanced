@@ -26,7 +26,6 @@ It is recommended to use a mod manager such as [r2modman](https://github.com/ebk
 - Improved maintainability.
     - Harmony initialization now wrapped in a try-catch.
     - Re-organized project and made use of abstraction with aptly named methods.
-    - Plugin metadata now has its own class - no longer hidden deep in `/obj/../../`.
     - Made it easier to PR (post-build event, gitignore)
 - Code optimizations.
     - MovementAdder removed. Movement script is now given on player spawn instead of each frame.
