@@ -1,10 +1,9 @@
-> [!WARNING]
-> **THIS PROJECT IS NO LONGER MAINTAINED.**<br>
-> **I WILL NOT AFFILIATE WITH THUNDERSTORE OR THE MODDING DISCORD.**<br>
-> **THE [LATEST RELEASE](https://github.com/Owen3H/MovementCompany-Enhanced/releases) WORKS WITH CSYNC `v2.2.1`.**
-
 # MovementCompany-Enhanced
 A configurable fork of 2018's [Movement-Company](https://github.com/u-2018/Movement-Company).<br>
+
+**Note**:\
+I'm on a temporary break from this project.\
+Join my [discord](https://discord.com/invite/CMyTmUMP2P) to stay updated.
 
 # Installation
 It is recommended to use a mod manager such as [r2modman](https://github.com/ebkr/r2modmanPlus) to handle installing the mod and its dependencies.
@@ -27,7 +26,6 @@ It is recommended to use a mod manager such as [r2modman](https://github.com/ebk
 - Improved maintainability.
     - Harmony initialization now wrapped in a try-catch.
     - Re-organized project and made use of abstraction with aptly named methods.
-    - Plugin metadata now has its own class - no longer hidden deep in `/obj/../../`.
     - Made it easier to PR (post-build event, gitignore)
 - Code optimizations.
     - MovementAdder removed. Movement script is now given on player spawn instead of each frame.
