@@ -1,10 +1,8 @@
 using System;
-using BepInEx.Configuration;
-
 using System.Runtime.Serialization;
+using BepInEx.Configuration;
 using CSync.Lib;
 using CSync.Util;
-using MovementCompanyEnhanced.Patches;
 
 namespace MovementCompanyEnhanced.Core;
 
@@ -69,7 +67,10 @@ public class MCEConfig : SyncedConfig<MCEConfig> {
         configFile = cfg;
         PLUGIN_ENABLED = NewEntry(ConfigCategory.GENERAL, "bEnabled", true, "Enable or disable the plugin globally.");
 
-        SyncComplete += ApplySpeedsAfterSync;
+        SyncComplete += (bool completed) => {
+            if (!completed)
+                Resync();
+        };
     }
 
     private ConfigEntry<V> NewEntry<V>(ConfigCategory category, string key, V defaultVal, string desc) =>
@@ -197,7 +198,4 @@ public class MCEConfig : SyncedConfig<MCEConfig> {
 
         EnableHostSyncControl(SYNC_TO_CLIENTS);
     }
-
-    void ApplySpeedsAfterSync(object s, EventArgs e) => 
-        PlayerControllerPatch.movementScript.ApplyConfigSpeeds();
 }

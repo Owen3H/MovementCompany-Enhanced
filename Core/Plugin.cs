@@ -6,14 +6,18 @@ using LC_API.ServerAPI;
 
 namespace MovementCompanyEnhanced.Core;
 
-[BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]
+[BepInPlugin(GUID, NAME, VERSION)]
 [BepInDependency("io.github.CSync", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("LC_API", BepInDependency.DependencyFlags.HardDependency)]
 public class Plugin : BaseUnityPlugin {
+    public const string GUID = MyPluginInfo.PLUGIN_GUID;
+    public const string NAME = MyPluginInfo.PLUGIN_NAME;
+    public const string VERSION = MyPluginInfo.PLUGIN_VERSION;
+
     internal static new ManualLogSource Logger { get; private set; }
     public static new MCEConfig Config { get; private set; }
 
-    private Harmony patcher;
+    private Harmony Patcher;
 
     private void Awake() {
         Logger = base.Logger;
@@ -24,8 +28,8 @@ public class Plugin : BaseUnityPlugin {
         Config.InitBindings();
 
         try {
-            patcher = new(Metadata.GUID);
-            patcher.PatchAll();
+            Patcher = new(GUID);
+            Patcher.PatchAll();
 
             Logger.LogInfo("Plugin loaded.");
         } catch(Exception e) {
@@ -46,11 +50,4 @@ public class Plugin : BaseUnityPlugin {
 
         return enabled;
     }
-
-    //public void LogPatches() {
-    //    IEnumerable<MethodBase> patches = patcher.GetPatchedMethods();
-    //    string str = string.Join(", ", patches.ToList());
-
-    //    Logger.LogInfo("Applied patches to: " + str);
-    //}
 }

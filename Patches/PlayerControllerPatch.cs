@@ -1,15 +1,12 @@
-using GameNetcodeStuff;
-using HarmonyLib;
-
-using MovementCompanyEnhanced.Component;
-using MovementCompanyEnhanced.Core;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-
+using GameNetcodeStuff;
+using HarmonyLib;
+using MovementCompanyEnhanced.Component;
+using MovementCompanyEnhanced.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;

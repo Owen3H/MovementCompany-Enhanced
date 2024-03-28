@@ -1,12 +1,12 @@
+using System;
 using GameNetcodeStuff;
 using MovementCompanyEnhanced.Core;
-using System;
 using UnityEngine;
 
 namespace MovementCompanyEnhanced.Component;
 
 internal class CustomMovement : MonoBehaviour {
-    public PlayerControllerB player { get; internal set; }
+    public PlayerControllerB player { get; internal set; } = null;
 
     internal MCEConfig cfg => MCEConfig.Instance;
 
@@ -38,9 +38,7 @@ internal class CustomMovement : MonoBehaviour {
     }
 
     void Start() {
-        if (MCEConfig.IsHost) {
-            ApplyConfigSpeeds(true);
-        }
+        ApplyConfigSpeeds(MCEConfig.IsHost);
 
         velToAdd = new(0.0002f, 0.0002f, 0.0002f);
 
@@ -81,8 +79,15 @@ internal class CustomMovement : MonoBehaviour {
     }
 
     internal void ApplyConfigSpeeds(bool host = false) {
+        Plugin.Logger.LogDebug("Attempting to apply config speeds!");
+
+        if (cfg == null) {
+            Plugin.Logger.LogWarning("Config instance is null! Could not apply speeds.");
+            return;
+        }
+
         var prefix = host ? "Host" : "Client";
-        Plugin.Logger.LogDebug($"{prefix} - move speed set to: {cfg?.MOVEMENT_SPEED?.Value}");
+        Plugin.Logger.LogDebug($"{prefix} - move speed set to: {cfg?.MOVEMENT_SPEED?.Value ?? player.movementSpeed}");
 
         player.movementSpeed = ValNonNegative(cfg.MOVEMENT_SPEED);
         player.climbSpeed = ValNonNegative(cfg.CLIMB_SPEED);
