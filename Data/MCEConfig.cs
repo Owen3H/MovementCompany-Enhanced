@@ -6,18 +6,14 @@ using CSync.Util;
 
 namespace MovementCompanyEnhanced.Core;
 
-public struct ConfigCategory {
+public struct ConfigCategory(string value) {
     public static ConfigCategory GENERAL => new("0 >> General << 0");
     public static ConfigCategory MOVEMENT => new("1 >> Movement << 1");
     public static ConfigCategory STAMINA => new("2 >> Stamina << 2");
     public static ConfigCategory BHOP => new("3 >> Bhopping << 3");
     public static ConfigCategory MISC => new("4 >> Miscellaneous << 4");
 
-    public string Value { get; private set; }
-
-    private ConfigCategory(string value) {
-        Value = value;
-    }
+    public string Value { get; private set; } = value;
 }
 
 [DataContract]
@@ -67,9 +63,10 @@ public class MCEConfig : SyncedConfig<MCEConfig> {
         configFile = cfg;
         PLUGIN_ENABLED = NewEntry(ConfigCategory.GENERAL, "bEnabled", true, "Enable or disable the plugin globally.");
 
-        SyncComplete += (bool completed) => {
-            if (!completed)
+        SyncComplete += (bool success) => {
+            if (!success) {
                 Resync();
+            }
         };
     }
 
