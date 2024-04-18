@@ -2,13 +2,11 @@ using System;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using LC_API.ServerAPI;
 
 namespace MovementCompanyEnhanced.Core;
 
 [BepInPlugin(GUID, NAME, VERSION)]
 [BepInDependency("io.github.CSync", BepInDependency.DependencyFlags.SoftDependency)]
-[BepInDependency("LC_API", BepInDependency.DependencyFlags.HardDependency)]
 public class Plugin : BaseUnityPlugin {
     public const string GUID = MyPluginInfo.PLUGIN_GUID;
     public const string NAME = MyPluginInfo.PLUGIN_NAME;
@@ -39,7 +37,7 @@ public class Plugin : BaseUnityPlugin {
 
     public void OnDestroy() {
         if (!PluginEnabled()) return;
-        ModdedServer.SetServerModdedOnly();
+        //ModdedServer.SetServerModdedOnly();
     }
 
     public bool PluginEnabled(bool logIfDisabled = false) {

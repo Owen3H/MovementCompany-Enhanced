@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using BepInEx.Configuration;
 using GameNetcodeStuff;
 using HarmonyLib;
 using MovementCompanyEnhanced.Component;
@@ -22,6 +23,7 @@ internal class PlayerControllerPatch {
     static bool removeFirstDelay => MCEConfig.Instance.REMOVE_FIRST_JUMP_DELAY;
     static bool removeSecondDelay => MCEConfig.Instance.REMOVE_SECOND_JUMP_DELAY;
 
+    static ConfigEntry<bool> HoldToCrouch => Plugin.Config.HOLD_TO_CROUCH;
     static InputActionAsset Actions => IngamePlayerSettings.Instance.playerInput.actions;
 
     [HarmonyPostfix]
@@ -96,25 +98,16 @@ internal class PlayerControllerPatch {
     //}
 
     [HarmonyPrefix]
-    [HarmonyPatch("Crouch_performed")]
-    public static bool OnCrouch() {
-        // Disable crouch toggle
-        if (MCEConfig.Default.HOLD_TO_CROUCH) {
-            movementScript.player.Crouch(true);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    [HarmonyPrefix]
     [HarmonyPatch("OnEnable")]
     public static void CrouchHold() {
-        if (!MCEConfig.Default.HOLD_TO_CROUCH) return;
+        if (HoldToCrouch == null) return;
 
-        InputAction crouchAction = Actions.FindAction("Crouch", true);
-        RegisterActionCancel(crouchAction, CrouchCanceled);
+        try {
+            InputAction action = Actions.FindAction("Crouch", true);
+            RegisterActionCancel(action, CrouchCanceled);
+        } catch (Exception e) {
+            Plugin.Logger.LogError(e);
+        }
     }
 
     public static void RegisterActionCancel(InputAction action, Action<CallbackContext> callback, bool unregister = false) {
@@ -129,5 +122,18 @@ internal class PlayerControllerPatch {
     static void CrouchCanceled(CallbackContext _) {
         movementScript.player.Crouch(false);
         //crouchHeld = false;
+    }
+
+    static void CrouchPerformed() {
+        if (HoldToCrouch.Value) {
+            // Disable crouch toggle
+            movementScript.player.Crouch(true);
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch("Crouch_performed")]
+    public static void OnCrouch() {
+        CrouchPerformed();
     }
 }

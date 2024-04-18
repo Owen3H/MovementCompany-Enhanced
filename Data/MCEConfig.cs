@@ -26,7 +26,7 @@ public class MCEConfig : SyncedConfig<MCEConfig> {
     #region Synced entries
     [DataMember] public SyncedEntry<bool> SYNC_TO_CLIENTS { get; private set; }
 
-    [DataMember] public SyncedEntry<bool> HOLD_TO_CROUCH { get; private set; }
+    public ConfigEntry<bool> HOLD_TO_CROUCH { get; private set; }
     [DataMember] public SyncedEntry<bool> REMOVE_FIRST_JUMP_DELAY {  get; private set; }
     [DataMember] public SyncedEntry<bool> REMOVE_SECOND_JUMP_DELAY { get; private set; }
 
@@ -63,11 +63,9 @@ public class MCEConfig : SyncedConfig<MCEConfig> {
         configFile = cfg;
         PLUGIN_ENABLED = NewEntry(ConfigCategory.GENERAL, "bEnabled", true, "Enable or disable the plugin globally.");
 
-        SyncComplete += (bool success) => {
-            if (!success) {
-                Resync();
-            }
-        };
+        //SyncComplete += (bool success) => {
+        //    // Your logic here
+        //};
     }
 
     private ConfigEntry<V> NewEntry<V>(ConfigCategory category, string key, V defaultVal, string desc) =>
@@ -89,6 +87,11 @@ public class MCEConfig : SyncedConfig<MCEConfig> {
         #endregion
 
         #region Movement Related Values (Speeds, Fall Damage)
+        HOLD_TO_CROUCH = NewEntry(ConfigCategory.MOVEMENT, "bHoldToCrouch", true, 
+            "Whether the player should hold to crouch instead of a toggle.\n" +
+            "NOTE: This setting is client-side and cannot be forced by the host."
+        );
+
         MOVEMENT_SPEED = NewSyncedEntry(ConfigCategory.MOVEMENT, "fMovementSpeed", 4.1f,
             "The base speed at which the player moves. This is NOT a multiplier."
         );
@@ -100,11 +103,6 @@ public class MCEConfig : SyncedConfig<MCEConfig> {
         SINK_SPEED_MULTIPLIER = NewSyncedEntry(ConfigCategory.MOVEMENT, "fSinkSpeedMultiplier", 0.16f,
             "Value to multiply the sinking speed by when in quicksand.\n" +
             "Don't want to sink as fast? Decrease this value."
-        );
-
-        HOLD_TO_CROUCH = NewSyncedEntry(ConfigCategory.MOVEMENT, "bHoldToCrouch", true, 
-            "Whether the player should hold to crouch instead of a toggle.\n" +
-            "NOTE: This setting is client-side and cannot be forced by the host."
         );
 
         REMOVE_FIRST_JUMP_DELAY = NewSyncedEntry(ConfigCategory.MOVEMENT, "bRemoveFirstJumpDelay", true,
