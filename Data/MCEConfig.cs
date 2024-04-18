@@ -62,10 +62,6 @@ public class MCEConfig : SyncedConfig<MCEConfig> {
 
         configFile = cfg;
         PLUGIN_ENABLED = NewEntry(ConfigCategory.GENERAL, "bEnabled", true, "Enable or disable the plugin globally.");
-
-        //SyncComplete += (bool success) => {
-        //    // Your logic here
-        //};
     }
 
     private ConfigEntry<V> NewEntry<V>(ConfigCategory category, string key, V defaultVal, string desc) =>

@@ -15,8 +15,8 @@ public class Plugin : BaseUnityPlugin {
     internal static new ManualLogSource Logger { get; private set; }
     public static new MCEConfig Config { get; private set; }
 
-    private Harmony Patcher;
-
+    Harmony Patcher;
+    
     private void Awake() {
         Logger = base.Logger;
         Config = new(base.Config);
@@ -33,11 +33,6 @@ public class Plugin : BaseUnityPlugin {
         } catch(Exception e) {
             Logger.LogError(e);
         }
-    }
-
-    public void OnDestroy() {
-        if (!PluginEnabled()) return;
-        //ModdedServer.SetServerModdedOnly();
     }
 
     public bool PluginEnabled(bool logIfDisabled = false) {
