@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+
 using BepInEx.Configuration;
 using GameNetcodeStuff;
 using HarmonyLib;
+
 using MovementCompanyEnhanced.Component;
 using MovementCompanyEnhanced.Core;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
@@ -104,7 +107,7 @@ internal class PlayerControllerPatch {
 
         try {
             InputAction action = Actions.FindAction("Crouch", true);
-            RegisterActionCancel(action, CrouchCanceled);
+            RegisterActionCancel(action, CrouchCancelled);
         } catch (Exception e) {
             Plugin.Logger.LogError(e);
         }
@@ -119,21 +122,39 @@ internal class PlayerControllerPatch {
         action.canceled += callback;
     }
 
-    static void CrouchCanceled(CallbackContext _) {
+    static void CrouchCancelled(CallbackContext _) {
         movementScript.player.Crouch(false);
         //crouchHeld = false;
     }
 
-    static void CrouchPerformed() {
-        if (HoldToCrouch.Value) {
-            // Disable crouch toggle
-            movementScript.player.Crouch(true);
-        }
-    }
+    //// Custom crouch condition
+    //static void CrouchPerformed() {
+    //    if (!HoldToCrouch.Value || movementScript.player.isCrouching) return;
 
-    [HarmonyPrefix]
-    [HarmonyPatch("Crouch_performed")]
-    public static void OnCrouch() {
-        CrouchPerformed();
-    }
+    //    movementScript.player.Crouch(true);
+    //    Plugin.Logger.LogDebug("HoldToCrouch: Crouch performed");
+    //}
+
+    //[HarmonyPrefix]
+    //[HarmonyPatch("Crouch_performed")]
+    //public static bool OnCrouch() {
+    //    CrouchPerformed();
+
+    //    // Disable crouch toggle
+    //    return false;
+    //}
+
+    //[HarmonyTranspiler]
+    //[HarmonyPatch("Crouch_performed")]
+    //public static IEnumerable<CodeInstruction> ReplaceCrouchToggle(IEnumerable<CodeInstruction> instructions) {
+    //    List<CodeInstruction> patchedInstructions = instructions.ToList();
+
+    //    for (int i = 0; i < patchedInstructions.Count; i++)  {
+    //        var cur = patchedInstructions[i];
+
+    //        Plugin.Logger.LogDebug($"Code: {cur.opcode}\nOperand: {cur.operand}");
+    //    }
+
+    //    return patchedInstructions;
+    //}
 }

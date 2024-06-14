@@ -169,10 +169,10 @@ internal class CustomMovement : MonoBehaviour {
     }
 
     private void SetStamina(float val) {
-        // Prevents potential weird behaviours.
         player.sprintMeter = ValNonNegative(val);
     }
 
+    // Prevents potential weird behaviours.
     private float ValNonNegative(float newVal) {
         if (newVal <= 0f) {
             newVal = 0f;
