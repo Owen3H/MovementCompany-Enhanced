@@ -1,9 +1,7 @@
+> No longer maintained. This modding scene killed itself, good job.
+
 # MovementCompany-Enhanced
 A configurable fork of 2018's [Movement-Company](https://github.com/u-2018/Movement-Company).<br>
-
-**Note**:\
-I'm on a temporary break from this project.\
-Join my [discord](https://discord.com/invite/CMyTmUMP2P) to stay updated.
 
 # Installation
 It is recommended to use a mod manager such as [r2modman](https://github.com/ebkr/r2modmanPlus) to handle installing the mod and its dependencies.
